@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Robank</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="usage_title">1. Application Usage</string>
+    <string name="usage_text">The Robank application is designed to help you manage your personal finances, track your savings, and achieve your financial goals. The use of this application for illicit activities, fraud, or any unauthorized purpose is strictly prohibited.</string>
+    <string name="privacy_title">2. Privacy</string>
+    <string name="privacy_text">At Robank, we value your privacy. We collect and process your personal information solely to provide our services. All data is handled in accordance with our Privacy Policy, which can be reviewed within the application.</string>
+    <string name="ip_title">3. Intellectual Property</string>
+    <string name="ip_text">All content, logos, designs, and graphical elements of the Robank application are the exclusive property of Robank Inc. Reproduction, distribution, or unauthorized use of any content is strictly prohibited.</string>
+    <string name="liability_title">4. Limitation of Liability</string>
+    <string name="liability_text">Robank is not responsible for financial losses, errors in data handling, or any direct or indirect damages resulting from the use of the application. Users are responsible for verifying the provided information before making financial decisions.</string>
+    <string name="modifications_title">5. Modifications</string>
+    <string name="modifications_text">Robank reserves the right to modify these Terms and Conditions at any time. Updates will be notified through the application and will take effect once published.</string>
+    <string name="jurisdiction_title">6. Jurisdiction</string>
+    <string name="jurisdiction_text">These terms are governed by the applicable laws of your country of residence. Any disputes will be resolved under the jurisdiction of the relevant courts.</string>
 </resources>

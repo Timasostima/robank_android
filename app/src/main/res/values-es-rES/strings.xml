@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Robank</string>
+    <string name="terms_and_conditions">Términos y condiciones</string>
+    <string name="usage_title">1. Uso de la Aplicación</string>
+    <string name="usage_text">La aplicación Robank está diseñada para ayudarle a administrar sus finanzas personales, hacer un seguimiento de sus ahorros y alcanzar sus objetivos financieros. El uso de esta aplicación para actividades ilícitas, fraude o cualquier propósito no autorizado está estrictamente prohibido.</string>
+    <string name="privacy_title">2. Privacidad</string>
+    <string name="privacy_text">En Robank, valoramos su privacidad. Recopilamos y procesamos su información personal únicamente para brindar nuestros servicios. Todos los datos se manejan de acuerdo con nuestra Política de privacidad, que puede consultarse dentro de la aplicación.</string>
+    <string name="ip_title">3. Propiedad intelectual</string>
+    <string name="ip_text">Todo el contenido, logotipos, diseños y elementos gráficos de la aplicación Robank son propiedad exclusiva de Robank Inc. La reproducción, distribución o uso no autorizado de cualquier contenido está estrictamente prohibido.</string>
+    <string name="liability_title">4. Limitación de responsabilidad</string>
+    <string name="liability_text">Robank no se hace responsable de pérdidas financieras, errores en el manejo de datos o cualquier daño directo o indirecto que resulte del uso de la aplicación. Los usuarios son responsables de verificar la información proporcionada antes de tomar decisiones financieras.</string>
+    <string name="modifications_title">5. Modificaciones</string>
+    <string name="modifications_text">Robank se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Las actualizaciones se notificarán a través de la aplicación y entrarán en vigor una vez publicadas.</string>
+    <string name="jurisdiction_title">6. Jurisdicción</string>
+    <string name="jurisdiction_text">Estos términos se rigen por las leyes aplicables de su país de residencia. Cualquier disputa se resolverá en la jurisdicción de los tribunales pertinentes.</string>
+</resources>
