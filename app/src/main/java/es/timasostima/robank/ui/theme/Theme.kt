@@ -18,6 +18,12 @@ private val DarkColorScheme = darkColorScheme(
 
     onSurface = White,
     onSecondaryContainer = White.copy(alpha = 0.45f),
+
+    //textfields, configs, home sections, charts topBar and lists
+    surface = DarkerBlue,
+
+//    surfaceContainer = LightBlue,
+
     //navbar selection
     secondaryContainer = White.copy(alpha = 0.15f),
 )
@@ -28,6 +34,11 @@ private val LightColorScheme = lightColorScheme(
 
     onSurface = Black,
     onSecondaryContainer = DarkBlue.copy(alpha = 0.45f),
+
+    surface = Whiter,
+
+//    surfaceContainer = Gray,
+
     secondaryContainer = DarkBlue.copy(alpha = 0.10f),
 
 //    background = Color(0xFFFFFBFE),
@@ -52,7 +63,8 @@ fun RobankTheme(
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }*/
+        }
+        */
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
