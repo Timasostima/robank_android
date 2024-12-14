@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "es.timasostima.robank"
-        minSdk = 24
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation(libs.androidx.animation.graphics.android)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -76,13 +77,18 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
-//    implementation(libs.coil.compose)
-//    implementation(libs.coil.network.okhttp)
-
     //firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database);
     implementation(libs.play.services.auth)
     implementation(libs.googleid)
+
+//  Dialogs
+    implementation(libs.picker.core)
+    implementation(libs.picker.color)
+    implementation(libs.picker.input)
+    implementation(libs.picker.state)
+
+    implementation(libs.accompanist.permissions)
 }
