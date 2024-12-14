@@ -1,6 +1,6 @@
 package es.timasostima.robank.config
 
-import android.app.LocaleManager
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,11 +30,11 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,51 +45,68 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.state.StateDialog
+import com.maxkeppeler.sheets.state.models.State
+import com.maxkeppeler.sheets.state.models.StateConfig
 import es.timasostima.robank.R
 import es.timasostima.robank.charts.buttomBorder
 import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.database.Database
+import es.timasostima.robank.database.GoalData
 import es.timasostima.robank.database.PreferencesData
+import es.timasostima.robank.enterApp.AccountManager
+import es.timasostima.robank.enterApp.PasswordReset
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfigScreen(
     preferences: PreferencesData,
-    changeMode: (Boolean?) -> Unit,
-    db: Database
+    db: Database,
+    accountManager: AccountManager
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var showPasswordResetDialog by remember { mutableStateOf(false) }
+
     Column (modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colorScheme.background)
         .padding(top = 30.dp)
     ) {
         UserRow()
+
         Spacer(Modifier.height(20.dp))
+
         val mod = Modifier
             .fillMaxWidth()
             .height(60.dp)
             .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 20.dp)
             .buttomBorder(1.dp, MaterialTheme.colorScheme.onSecondaryContainer)
-
         Row (
             verticalAlignment = Alignment.CenterVertically,
             modifier = mod
         ){
+            val system = stringResource(R.string.system)
             val onPick: (String) -> Unit = { item ->
-                val name = item.substring(0, item.length - 5)
-                context
-                    .getSystemService(LocaleManager::class.java)
-                    .applicationLocales =
-                    android.os.LocaleList(java.util.Locale(name.lowercase(), name.uppercase()))
+                if (item == system) {
+                    db.changeLanguage("system")
+                }
+                else{
+                    val name = item.substring(0, item.length - 5)
+                    db.changeLanguage(name)
+                }
             }
             Text(stringResource(R.string.language))
             Spacer(modifier = Modifier.weight(1f))
-            Picker( //it resets every time the screen is out os the composition
+            Picker(
                 listOf(
-                    stringResource(R.string.system), "EN \uD83C\uDDEC\uD83C\uDDE7", "ES \uD83C\uDDEA\uD83C\uDDF8",
+                    system, "EN \uD83C\uDDEC\uD83C\uDDE7", "ES \uD83C\uDDEA\uD83C\uDDF8",
                 //    "UCR \uD83C\uDDFA\uD83C\uDDE6", "RO \uD83C\uDDF7\uD83C\uDDF4", "RU \uD83C\uDDF7\uD83C\uDDFA"
-                ),
+                ).sortedBy { it.lowercase().contains(preferences.language) },
+                preferences.language,
                 onPick
             )
         }
@@ -96,9 +114,16 @@ fun ConfigScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = mod
         ){
+            val onPick: (String) -> Unit = { item ->
+                db.changeCurrency(item)
+            }
             Text(stringResource(R.string.currency))
             Spacer(modifier = Modifier.weight(1f))
-            Picker(listOf("eur", "usd", "rub"), {})
+            Picker(
+                listOf("eur", "usd", "rub").sortedBy { it.contains(preferences.currency) },
+                preferences.currency,
+                onPick
+            )
         }
         Row (
             verticalAlignment = Alignment.CenterVertically,
@@ -126,12 +151,6 @@ fun ConfigScreen(
                 "light" -> sun
                 else -> systemTheme
             }
-            changeMode(when (theme) {
-                "system" -> null
-                "dark" -> true
-                "light" -> false
-                else -> null
-            })
 
             Icon(
                 painter = icon,
@@ -160,12 +179,15 @@ fun ConfigScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = mod
         ){
-            var agreeToNotif by remember { mutableStateOf(false) }
+            var persistedNotif by rememberSaveable { mutableStateOf(preferences.notifications) }
             Text("Notifications")
             Spacer(modifier = Modifier.weight(1f))
             Switch(
-                checked = agreeToNotif,
-                onCheckedChange = { agreeToNotif = it },
+                checked = persistedNotif,
+                onCheckedChange = {
+                    persistedNotif = it
+                    db.changeNotifications(it)
+                },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.primary,
                     checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
@@ -187,7 +209,9 @@ fun ConfigScreen(
                 stringResource(R.string.change),
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
-                    .clickable { }
+                    .clickable {
+                        showPasswordResetDialog = true
+                    }
                     .padding(5.dp)
             )
         }
@@ -195,6 +219,27 @@ fun ConfigScreen(
         Box(modifier = Modifier.fillMaxSize()){
             Text(stringResource(R.string.coming_soon), fontSize = 40.sp, modifier = Modifier.align(Alignment.Center))
         }
+    }
+
+
+    var showPasswordResetConfirmation by remember { mutableStateOf(false) }
+    if (showPasswordResetDialog){
+        PasswordReset(context, scope, accountManager, {showPasswordResetConfirmation = true}) { showPasswordResetDialog = false }
+    }
+    if (showPasswordResetConfirmation){
+        StateDialog(
+            state = rememberUseCaseState(
+                visible = true,
+                onCloseRequest = { showPasswordResetConfirmation = false }
+            ),
+            config = StateConfig(
+                state = State.Success(labelText = stringResource(R.string.password_reset_email_sent)),
+            ),
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true
+            )
+        )
     }
 }
 
@@ -234,14 +279,16 @@ fun UserRow(){
 @Composable
 fun Picker(
     configValues: List<String>,
-    onPick: (String) -> Unit
+    picked: String,
+    onPick: (String) -> Unit,
 ) {
     var isDropDownExpanded by remember {
         mutableStateOf(false)
     }
-    val itemPosition = rememberSaveable {
-        mutableIntStateOf(0)
-    }
+
+    var persistedText by rememberSaveable { mutableStateOf(
+        configValues.first { it.lowercase().contains(picked.lowercase()) }
+    ) }
 
     Box {
         Row(
@@ -254,7 +301,7 @@ fun Picker(
                 }
                 .padding(10.dp)
         ) {
-            Text(text = configValues[itemPosition.intValue])
+            Text(text = persistedText)
             Icon(
                 Icons.Default.ArrowDropDown,
                 "dropdown icon",
@@ -272,7 +319,7 @@ fun Picker(
                 },
                     onClick = {
                         isDropDownExpanded = false
-                        itemPosition.intValue = index
+                        persistedText = item
                         onPick(item)
                     }
                 )
@@ -285,13 +332,11 @@ fun Picker(
 @Composable
 fun CategoryPicker(
     configValues: List<CategoryData>,
+    pickedCategory: CategoryData,
     onPick: (CategoryData) -> Unit
 ) {
     var isDropDownExpanded by remember {
         mutableStateOf(false)
-    }
-    val itemPosition = rememberSaveable {
-        mutableIntStateOf(0)
     }
 
     Box {
@@ -307,8 +352,7 @@ fun CategoryPicker(
                 .padding(10.dp)
         ) {
             Text(
-                text = if (configValues.isEmpty()) "No hay"
-                    else configValues[itemPosition.intValue].name
+                text = pickedCategory.name,
             )
             Icon(
                 Icons.Default.ArrowDropDown,
@@ -321,14 +365,13 @@ fun CategoryPicker(
             onDismissRequest = {
                 isDropDownExpanded = false
             }) {
-            configValues.forEachIndexed { index, item ->
+            configValues.forEach { category ->
                 DropdownMenuItem(text = {
-                    Text(text = item.name)
+                    Text(text = category.name)
                 },
                     onClick = {
                         isDropDownExpanded = false
-                        itemPosition.intValue = index
-                        onPick(item)
+                        onPick(category)
                     }
                 )
             }
