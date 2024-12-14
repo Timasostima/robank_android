@@ -26,13 +26,13 @@
                     android:valueTo="M 0 0 C 0 0 0 0 0 0 C 12.722 0 25.444 0 38.167 0 C 50.889 0 63.611 0 76.333 0 C 89.055 0 101.778 0 114.5 0 C 150.5 0 154 24.242 169.5 17.716 C 195.358 6.827 194 49.808 213 38.802 C 235.358 25.85 256 50.851 242 60.39 C 215.111 60.39 188.222 60.39 161.333 60.39 C 134.444 60.39 107.556 60.39 80.667 60.39 C 67.222 60.39 53.778 60.39 40.333 60.39 C 26.889 60.39 13.444 60.39 0 60.39 C 0 50.349 0 40.308 0 30.249 C 0 20.19 0 10.113 0 0"
                     android:valueType="pathType"
                     android:interpolator="@android:interpolator/fast_out_slow_in"/>
-                <objectAnimator
-                    android:propertyName="fillAlpha"
-                    android:duration="400"
-                    android:valueFrom="0"
-                    android:valueTo="1"
-                    android:valueType="floatType"
-                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
+<!--                <objectAnimator-->
+<!--                    android:propertyName="fillAlpha"-->
+<!--                    android:duration="400"-->
+<!--                    android:valueFrom="0"-->
+<!--                    android:valueTo="1"-->
+<!--                    android:valueType="floatType"-->
+<!--                    android:interpolator="@android:interpolator/fast_out_slow_in"/>-->
             </set>
         </aapt:attr>
     </target>
