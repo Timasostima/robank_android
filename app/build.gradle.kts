@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -9,12 +11,24 @@ android {
     namespace = "es.timasostima.robank"
     compileSdk = 35
 
+    val file = rootProject.file("local.properties")
+    val properties =Properties()
+    properties.load(file.inputStream())
+
     defaultConfig {
         applicationId = "es.timasostima.robank"
         minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "GCM_SENDER_ID", "\"${properties.getProperty("gcm_defaultSenderId")}\"")
+        buildConfigField("String", "GOOGLE_API_KEY", "\"${properties.getProperty("google_api_key")}\"")
+        buildConfigField("String", "GOOGLE_APP_ID", "\"${properties.getProperty("google_app_id")}\"")
+        buildConfigField("String", "GOOGLE_CRASH_KEY", "\"${properties.getProperty("google_crash_reporting_api_key")}\"")
+        buildConfigField("String", "GOOGLE_STORAGE", "\"${properties.getProperty("google_storage_bucket")}\"")
+        buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", "\"${properties.getProperty("google_server_client_id")}\"")
+        buildConfigField("String", "FIREBASE_DATABASE", "\"${properties.getProperty("firebase_database_url")}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -40,6 +54,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
