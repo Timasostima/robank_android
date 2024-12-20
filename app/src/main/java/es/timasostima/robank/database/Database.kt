@@ -2,6 +2,7 @@ package es.timasostima.robank.database
 
 import android.app.LocaleManager
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -9,6 +10,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
 import com.google.firebase.database.ktx.database
+import es.timasostima.robank.BuildConfig
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.time.LocalTime
@@ -45,14 +47,13 @@ data class PreferencesData(
     constructor() : this("", "", "", false)
 }
 
-val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 class Database(
     private val userId: String
 ) {
-    private val db: FirebaseDatabase =
-        Firebase.database("https://robank-5c66d-default-rtdb.europe-west1.firebasedatabase.app")
+    private val db: FirebaseDatabase = Firebase.database(BuildConfig.FIREBASE_DATABASE)
 
     fun createUserData() {
         db
@@ -136,7 +137,7 @@ class Database(
                 snapshot.children.forEach {
                     it.ref.removeValue()
                 }
-            }
+        }
     }
 
     fun updateGoal(oldName: String, newName: String, newPrice: Double) {

@@ -10,14 +10,13 @@ import androidx.credentials.exceptions.CreateCredentialCancellationException
 import androidx.credentials.exceptions.CreateCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.recaptcha.RecaptchaException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import es.timasostima.robank.R
+import es.timasostima.robank.BuildConfig
 import es.timasostima.robank.database.Database
 import kotlinx.coroutines.tasks.await
 import java.security.MessageDigest
@@ -132,7 +131,7 @@ class AccountManager (
 
             val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(activity.getString(R.string.google_server_client_id))
+                .setServerClientId(BuildConfig.GOOGLE_SERVER_CLIENT_ID)
                 .setNonce(hashedNonce)
                 .build()
 
