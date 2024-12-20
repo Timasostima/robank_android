@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Robank</string>
     <string name="terms_and_conditions">Terms and Conditions</string>
     <string name="usage_title">1. Application Usage</string>
     <string name="usage_text">The Robank application is designed to help you manage your personal finances, track your savings, and achieve your financial goals. The use of this application for illicit activities, fraud, or any unauthorized purpose is strictly prohibited.</string>
@@ -21,9 +21,6 @@
     <string name="bills">Bills</string>
     <string name="no_categories_to_show">No categories to show</string>
     <string name="no_bills_to_show">No bills to show</string>
-    <string name="app_email" translatable="false">robank.app@gmail.com</string>
-    <string name="email_subject" translatable="false">User Contact</string>
-    <string name="system" translatable="false">System</string>
     <string name="change_the_password">Change the password?</string>
     <string name="change">Change</string>
     <string name="need_help">Need help?</string>
