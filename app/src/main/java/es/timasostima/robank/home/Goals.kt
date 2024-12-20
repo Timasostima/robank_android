@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -165,18 +166,19 @@ internal fun CreateAGoal(
         InputTextField(
             type = InputTextFieldType.OUTLINED,
             header = InputHeader(
-                title = "Goal name:",
+                title = stringResource(R.string.goal_name),
             ),
             validationListener = { value ->
                 if ((value?.trim()?.length ?: 0) < 3) ValidationResult.Invalid(context.getString(R.string.name_needs_to_be_at_least_3_letters_long))
                 else ValidationResult.Valid
             },
+            singleLine = true,
             required = true
         ),
         InputTextField(
             type = InputTextFieldType.OUTLINED,
             header = InputHeader(
-                title = "Goal price:", ////////////////////////////////////////////////////////////////
+                title = stringResource(R.string.goal_price),
             ),
             validationListener = { value ->
                 if (value.isNullOrBlank()) ValidationResult.Invalid(context.getString(R.string.price_is_required))
@@ -189,6 +191,7 @@ internal fun CreateAGoal(
                 )
                 else ValidationResult.Valid
             },
+            singleLine = true,
             required = true
         )
     )
