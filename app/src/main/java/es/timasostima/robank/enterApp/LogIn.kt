@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,24 +25,35 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.size.Size as SizeCoil
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.input.InputDialog
 import com.maxkeppeler.sheets.input.models.InputHeader
@@ -53,7 +66,9 @@ import com.maxkeppeler.sheets.state.models.State
 import com.maxkeppeler.sheets.state.models.StateConfig
 import es.timasostima.robank.R
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,13 +104,33 @@ fun LogIn(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ){
-        Image(
-            painter = painterResource(R.drawable.logo),
-            contentDescription = "app logo",
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.3f)
-        )
+        var targetTimeEnvelope: Long by remember { mutableLongStateOf(0L) }
+        LaunchedEffect (key1 = true){
+            while (true){
+                delay(5000)
+                targetTimeEnvelope = System.currentTimeMillis() + 1600
+            }
+        }
+        Countdown(targetTimeEnvelope) { remainingTime ->
+            if (remainingTime > 0) {
+                AnimatedLogo(
+                    gifDrawable = R.drawable.logo_animated,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.3f)
+                )
+            }
+            else {
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = "app logo",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.3f)
+                )
+            }
+        }
+
         Column (
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
@@ -180,9 +215,10 @@ fun LogIn(
                                 showCredentialsFailureDialog = true
                             }
                         }
-                    }
+                    },
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Text("Log In")
+                    Text(stringResource(R.string.log_in))
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
@@ -229,7 +265,9 @@ fun LogIn(
             ){
                 Text(
                     stringResource(R.string.don_t_have_an_account_yet),
-                    color = MaterialTheme.colorScheme.onSurface)
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 12.sp
+                )
                 Text(
                     stringResource(R.string.sign_up_ex),
                     color = MaterialTheme.colorScheme.primary,
@@ -320,6 +358,8 @@ fun PasswordReset(
                 }
                 else ValidationResult.Valid
             },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            singleLine = true,
             required = true
         )
     )
@@ -343,4 +383,42 @@ fun PasswordReset(
             },
         )
     )
+}
+
+@Composable
+fun AnimatedLogo(
+    gifDrawable: Int,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(ImageDecoderDecoder.Factory())
+        }
+        .build()
+    Image(
+        painter = rememberAsyncImagePainter(
+            ImageRequest
+                .Builder(context)
+                .data(data = gifDrawable)
+                .build(),
+            imageLoader = imageLoader
+        ),
+        contentDescription = null,
+        modifier = modifier.padding(top=2.dp, start = 2.dp),
+    )
+}
+
+@Composable
+fun Countdown(targetTime: Long, content: @Composable (remainingTime: Long) -> Unit) {
+    var remainingTime by remember(targetTime) {
+        mutableLongStateOf(targetTime - System.currentTimeMillis())
+    }
+
+    content.invoke(remainingTime)
+
+    LaunchedEffect(remainingTime) {
+        delay(100L)
+        remainingTime = targetTime - System.currentTimeMillis()
+    }
 }

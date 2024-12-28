@@ -106,4 +106,8 @@ dependencies {
     implementation(libs.picker.state)
 
     implementation(libs.accompanist.permissions)
+    implementation(libs.accompanist.drawablepainter)
+
+    implementation (libs.coil.compose)
+    implementation (libs.coil.gif)
 }
