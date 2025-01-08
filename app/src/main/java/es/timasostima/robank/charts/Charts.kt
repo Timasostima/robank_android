@@ -41,10 +41,25 @@ import es.timasostima.robank.database.CategoryData
 @Composable
 fun Charts(
     billsList: MutableList<BillData>,
-    categoriesList: MutableList<CategoryData>
+    categoriesList: MutableList<CategoryData>,
+    currency: String
 ) {
     val controller = rememberNavController()
     val navBackStack by controller.currentBackStackEntryAsState()
+
+    val curSym = when (currency){
+        "usd" -> "$"
+        "eur" -> "€"
+        "rub" -> "₽"
+        else -> "$"
+    }
+
+    val months = listOf(
+        stringResource(R.string.january), stringResource(R.string.february), stringResource(R.string.march),
+        stringResource(R.string.april), stringResource(R.string.may), stringResource(R.string.june),
+        stringResource(R.string.july), stringResource(R.string.august), stringResource(R.string.september),
+        stringResource(R.string.october), stringResource(R.string.november), stringResource(R.string.december)
+    )
 
     Column {
         ChartsNavigationBar(
@@ -60,7 +75,7 @@ fun Charts(
                     ChartPlaceholder(true)
                 }
                 else{
-                    Categories(billsList, categoriesList)
+                    Categories(billsList, categoriesList, curSym, months)
                 }
             }
             composable ("bills"){
@@ -68,7 +83,7 @@ fun Charts(
                     ChartPlaceholder(false)
                 }
                 else{
-                    Bills(billsList)
+                    Bills(billsList, curSym, months)
                 }
             }
         }
@@ -89,8 +104,7 @@ fun ChartsNavigationBar(
     ){
         val navigate: (String) -> Unit = { text ->
             controller.navigate(text){
-                popUpTo(controller.graph.startDestinationId){ ///////////////////////////////////////////////////
-                }
+                popUpTo(controller.graph.startDestinationId){}
                 launchSingleTop = true
             }
         }

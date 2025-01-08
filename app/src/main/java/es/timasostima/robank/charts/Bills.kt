@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import es.timasostima.robank.database.BillData
-import es.timasostima.robank.database.dateFormatter
 import es.timasostima.robank.topBorder
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
@@ -50,14 +48,32 @@ import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Pie
 import java.time.LocalDate
-import java.time.temporal.WeekFields
-import java.util.Date
 import java.util.Locale
 
 @Composable
 fun Bills(
-    billsList: MutableList<BillData>
+    billsList: MutableList<BillData>,
+    currency: String,
+    months: List<String>
 ) {
+    val chartValue by remember {
+        mutableStateOf(
+            billsList.map {
+                Pie(
+                    it.category.name,
+                    it.amount,
+                    Color(colorString.parseColor(it.category.color)),
+                    selectedScale = 1.1f,
+                    selectedPaddingDegree = 0f
+                )
+            }
+        )
+    }
+    var offset by remember { mutableIntStateOf(0) }
+    val calendar = Calendar.getInstance(Locale("es", "ES"))
+    calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+    var daysList = generateWeekData(calendar, offset)
+
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,30 +81,6 @@ fun Bills(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        val chartValue by remember {
-            mutableStateOf(
-                billsList.map {
-                    Pie(
-                        it.category.name,
-                        it.amount,
-                        Color(colorString.parseColor(it.category.color)),
-                        selectedScale = 1.1f,
-                        selectedPaddingDegree = 0f
-                    )
-                }
-            )
-        }
-        var offset by remember { mutableIntStateOf(0) }
-        val calendar = Calendar.getInstance(Locale("es", "ES"))
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-        var daysList = generateWeekData(calendar, offset)
-        val months = remember {
-            listOf(
-                "January", "February", "March",
-                "April", "May", "June", "July", "August",
-                "September", "October", "November", "December"
-            )
-        }
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -191,7 +183,6 @@ fun Bills(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxSize()
-//                            .clickable { function() }
                             .buttomBorder(
                                 1.dp,
                                 MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
@@ -229,7 +220,7 @@ fun Bills(
                             modifier = Modifier.weight(0.7f)
                         )
                         Text(
-                            "%.2f$".format(billsList[it].amount),
+                            "%.2f%s".format(billsList[it].amount, currency),
                             fontSize = 16.sp,
                             textAlign = TextAlign.End,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -254,17 +245,3 @@ private fun generateWeekData(calendar: Calendar, weekOffset: Int):List<LocalDate
     calendar.add(Calendar.DATE, -(weekOffset * 7))
     return list
 }
-
-//fun List<BillData>.toWeek(): List<BillData> {
-//    val currentDate = LocalDate.now()
-//    val currentWeek = currentDate.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear())
-//    val currentYear = currentDate.year
-//
-//    return this.filter { bill ->
-//        val billDate = LocalDate.parse(bill.date, dateFormatter)
-//        val billWeek = billDate.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear())
-//        val billYear = billDate.year
-//
-//        billWeek == currentWeek && billYear == currentYear
-//    }
-//}

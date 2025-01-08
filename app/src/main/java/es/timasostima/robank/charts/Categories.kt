@@ -1,6 +1,6 @@
 package es.timasostima.robank.charts
 
-import android.util.Log
+import android.icu.util.Calendar
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -44,12 +44,35 @@ import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.topBorder
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
+import java.util.Locale
 
 @Composable
 fun Categories(
     billsList: MutableList<BillData>,
-    categoriesList: MutableList<CategoryData>
+    categoriesList: MutableList<CategoryData>,
+    currency: String,
+    months: List<String>
 ) {
+    val calendar = remember {Calendar.getInstance(Locale("es", "ES"))}
+    val month = calendar.get(Calendar.MONTH)
+    val year = calendar.get(Calendar.YEAR)
+
+    var chartPIEs by remember {
+        mutableStateOf(
+            categoriesList.map { category ->
+                Pie(
+                    category.name,
+                    billsList.filter { it.category.name == category.name }.sumOf { it.amount },
+                    Color(colorString.parseColor(category.color)),
+                    selectedScale = 1.1f,
+                    selectedPaddingDegree = 0f
+                )
+            }
+        )
+    }
+
+    var selected: Int? by remember { mutableStateOf(null) }
+
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -57,24 +80,8 @@ fun Categories(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        var chartPIEs by remember {
-            mutableStateOf(
-                categoriesList.map { category ->
-                    Pie(
-                        category.name,
-                        billsList.filter { it.category.name == category.name }.sumOf { it.amount },
-                        Color(colorString.parseColor(category.color)),
-                        selectedScale = 1.1f,
-                        selectedPaddingDegree = 0f
-                    )
-                }
-            )
-        }
-
-        var selected: Int? by remember { mutableStateOf(null) }
-
         Text(
-            "Dec 2021",
+            "${months[month]} $year",
             fontSize = 30.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 20.dp)
@@ -109,7 +116,7 @@ fun Categories(
                 style = Pie.Style.Stroke(width = 60.dp)
             )
             Text(
-                "%.2f$".format(chartPIEs.sumOf { it.data }),
+                "%.2f%s".format(chartPIEs.sumOf { it.data }, currency),
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -121,7 +128,6 @@ fun Categories(
             modifier = Modifier.fillMaxHeight().topBorder(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
         ){
             items(chartPIEs.size) {
-//                Log.d("Categories", selected.toString())
 
                 Box(modifier = Modifier
                     .fillMaxWidth()
@@ -134,7 +140,6 @@ fun Categories(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxSize()
-//                            .clickable { function() }
                             .buttomBorder(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                             .padding(start = 10.dp, end = 20.dp)
                     ) {
@@ -156,7 +161,7 @@ fun Categories(
                         )
                         Spacer(modifier = Modifier.weight(0.7f))
                         Text(
-                            "%.2f$".format(chartPIEs[it].data),
+                            "%.2f%s".format(chartPIEs[it].data, currency),
                             fontSize = 20.sp,
                             textAlign = TextAlign.End,
                             color = MaterialTheme.colorScheme.onSurface,
