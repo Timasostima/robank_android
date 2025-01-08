@@ -83,7 +83,7 @@ fun TermsConditions(
                         }
                     },
                 ) {
-                    Text("I Agree")
+                    Text(stringResource(R.string.i_agree))
                 }
                 Button(
                     onClick = {

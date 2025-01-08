@@ -206,7 +206,11 @@ fun LogIn(
                             val result = accountManager.logIn(email, password)
 
                             if (result is LogInResult.Success) {
-                                navController.navigate("app/${result.user.uid}")
+                                navController.navigate("app/${result.user.uid}") {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        inclusive = true
+                                    }
+                                }
                             }
                             else if (result is LogInResult.EmailNotVerified) {
                                 showEmailDialog = true
@@ -227,7 +231,11 @@ fun LogIn(
                             val result = accountManager.signInGoogle()
 
                             if (result is LogInResult.Success) {
-                                navController.navigate("app/${result.user.uid}")
+                                navController.navigate("app/${result.user.uid}") {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        inclusive = true
+                                    }
+                                }
                             }
                         }
                     },
@@ -239,24 +247,24 @@ fun LogIn(
                         modifier = Modifier.size(25.dp)
                     )
                 }
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            val result = accountManager.signInGoogle()
-
-                            if (result is LogInResult.Success) {
-                                navController.navigate("app")
-                            }
-                        }
-                    },
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.github),
-                        contentDescription = "Github",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(25.dp)
-                    )
-                }
+//                IconButton(
+//                    onClick = {
+//                        scope.launch {
+//                            val result = accountManager.signInGoogle()
+//
+//                            if (result is LogInResult.Success) {
+//                                navController.navigate("app")
+//                            }
+//                        }
+//                    },
+//                ) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.github),
+//                        contentDescription = "Github",
+//                        tint = MaterialTheme.colorScheme.primary,
+//                        modifier = Modifier.size(25.dp)
+//                    )
+//                }
             }
 
             Row (

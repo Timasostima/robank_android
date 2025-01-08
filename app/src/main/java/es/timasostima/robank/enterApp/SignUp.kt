@@ -250,7 +250,7 @@ fun SignUp(
                 .clip(RoundedCornerShape(27.dp))
                 .clickable {
                     navController.navigate("logIn") {
-                        popUpTo("logIn") {
+                        popUpTo(navController.graph.startDestinationId) {
                             inclusive = true
                         }
                     }

@@ -75,7 +75,7 @@ fun EnterApp(
         composable("app/{userID}"){
             val userId = it.arguments?.getString("userID") ?: "Error"
             val db = Database(userId)
-            App(changeMode, db, accountManager)
+            App(changeMode, db, accountManager, navController)
         }
     }
 }

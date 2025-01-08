@@ -65,4 +65,20 @@
     <string name="log_in">Acceder</string>
     <string name="channel_name">Notification\n</string>
     <string name="channel_description">Desctiption lalala la laslals</string>
+    <string name="i_agree">Estoy de acuerdo</string>
+    <string name="save">Guardar</string>
+    <string name="no_goals_yet">No hay objetivos aún</string>
+    <string name="january">Enero</string>
+    <string name="february">Febrero</string>
+    <string name="march">Marzo</string>
+    <string name="april">Abril</string>
+    <string name="may">Mayo</string>
+    <string name="june">Junio</string>
+    <string name="july">Julio</string>
+    <string name="august">Agosto</string>
+    <string name="september">Septiembre</string>
+    <string name="october">Octubre</string>
+    <string name="november">Noviembre</string>
+    <string name="december">Diciembre</string>
+    <string name="notifications">Notificaciones</string>
 </resources>
