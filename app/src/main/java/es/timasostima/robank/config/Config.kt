@@ -31,7 +31,6 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavHostController
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.state.StateDialog
 import com.maxkeppeler.sheets.state.models.State
@@ -54,7 +54,6 @@ import es.timasostima.robank.R
 import es.timasostima.robank.charts.buttomBorder
 import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.database.Database
-import es.timasostima.robank.database.GoalData
 import es.timasostima.robank.database.PreferencesData
 import es.timasostima.robank.enterApp.AccountManager
 import es.timasostima.robank.enterApp.PasswordReset
@@ -62,6 +61,7 @@ import es.timasostima.robank.enterApp.PasswordReset
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfigScreen(
+    loginNav: NavHostController,
     preferences: PreferencesData,
     db: Database,
     accountManager: AccountManager
@@ -75,7 +75,7 @@ fun ConfigScreen(
         .background(MaterialTheme.colorScheme.background)
         .padding(top = 30.dp)
     ) {
-        UserRow()
+        UserRow(loginNav)
 
         Spacer(Modifier.height(20.dp))
 
@@ -180,7 +180,7 @@ fun ConfigScreen(
             modifier = mod
         ){
             var persistedNotif by rememberSaveable { mutableStateOf(preferences.notifications) }
-            Text("Notifications")
+            Text(stringResource(R.string.notifications))
             Spacer(modifier = Modifier.weight(1f))
             Switch(
                 checked = persistedNotif,
@@ -244,7 +244,9 @@ fun ConfigScreen(
 }
 
 @Composable
-fun UserRow(){
+fun UserRow(
+    loginNav: NavHostController,
+){
     val name = "Tymur Kulivar"
     val email = "tymurkulivar@gmail.com"
     Row (
@@ -270,7 +272,14 @@ fun UserRow(){
                 "Exit",
                 modifier = Modifier
                     .size(50.dp)
-                    .padding(10.dp),
+                    .padding(10.dp)
+                    .clickable {
+                        loginNav.navigate("logIn") {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                        }
+                    },
             )
         }
     }
@@ -313,7 +322,7 @@ fun Picker(
             onDismissRequest = {
                 isDropDownExpanded = false
             }) {
-            configValues.forEachIndexed { index, item ->
+            configValues.forEach { item ->
                 DropdownMenuItem(text = {
                     Text(text = item)
                 },

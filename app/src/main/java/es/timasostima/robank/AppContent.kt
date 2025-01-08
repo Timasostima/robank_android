@@ -12,6 +12,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
@@ -45,13 +48,14 @@ import es.timasostima.robank.ui.theme.RobankTheme
 fun App(
     changeMode: (Boolean?) -> Unit,
     db: Database,
-    accountManager: AccountManager
+    accountManager: AccountManager,
+    loginNav: NavHostController
 ) {
     val context = LocalContext.current
 
     val categoriesList: MutableList<CategoryData> = mutableListOf()
     val billsList: MutableList<BillData> = mutableListOf()
-    val goalsList: MutableList<GoalData> = mutableListOf()
+    val goalsList: SnapshotStateList<GoalData> = remember { mutableStateListOf() }
     val preferences = PreferencesData()
     db.loadCategories(categoriesList)
     db.loadBills(billsList)
@@ -72,13 +76,13 @@ fun App(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
-                HomeScreen(categoriesList, goalsList, db)
+                HomeScreen(categoriesList, goalsList, db, preferences.currency)
             }
             composable("config") {
-                ConfigScreen(preferences, db, accountManager)
+                ConfigScreen(loginNav, preferences, db, accountManager)
             }
             composable("charts") {
-                Charts(billsList, categoriesList)
+                Charts(billsList, categoriesList, preferences.currency)
             }
         }
     }

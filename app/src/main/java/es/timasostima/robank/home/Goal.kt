@@ -1,5 +1,6 @@
 package es.timasostima.robank.home
 
+import android.icu.util.Currency
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -42,7 +44,8 @@ fun ExpandableGoal(
     goal : GoalData,
     modifier: Modifier = Modifier,
     active : Boolean = false,
-    db : Database
+    db : Database,
+    currency: String
 ){
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
@@ -73,7 +76,7 @@ fun ExpandableGoal(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    "%.2f ".format(goal.price) + "$",
+                    "%.2f %s".format(goal.price, currency),
                     color = MaterialTheme.colorScheme.onSurface,
                 )
             }
@@ -128,7 +131,7 @@ fun ExpandableGoal(
                     .fillMaxWidth()
                     .padding(10.dp)
             ){
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
         }
     }
@@ -138,6 +141,7 @@ fun ExpandableGoal(
 fun BasicGoal(
     goal : GoalData,
     modifier: Modifier = Modifier,
+    currency: String
 ){
     Box (
         modifier = modifier
@@ -159,7 +163,7 @@ fun BasicGoal(
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                "%.2f ".format(goal.price) + "$",
+                "%.2f %s".format(goal.price, currency),
                 color = MaterialTheme.colorScheme.onSurface,
             )
         }

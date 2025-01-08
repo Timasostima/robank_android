@@ -29,9 +29,15 @@ import es.timasostima.robank.database.GoalData
 fun HomeScreen(
     categoriesList: MutableList<CategoryData>,
     goalsList: MutableList<GoalData>,
-    db: Database
+    db: Database,
+    currency: String
 ) {
-
+    val curSym = when (currency){
+        "usd" -> "$"
+        "eur" -> "€"
+        "rub" -> "₽"
+        else -> "$"
+    }
     SharedTransitionLayout {
         val navController = rememberNavController()
         NavHost(
@@ -45,7 +51,8 @@ fun HomeScreen(
                     this@composable,
                     goalsList,
                     categoriesList,
-                    db
+                    db,
+                    curSym
                 )
             }
             composable("goals") {
@@ -54,7 +61,8 @@ fun HomeScreen(
                     this@SharedTransitionLayout,
                     this@composable,
                     goalsList,
-                    db
+                    db,
+                    curSym
                 )
             }
         }

@@ -72,7 +72,8 @@ fun Home(
     animatedContentScope: AnimatedContentScope,
     goalsList: MutableList<GoalData>,
     categoriesList: MutableList<CategoryData>,
-    db: Database
+    db: Database,
+    currency: String
 ) {
     val context = LocalContext.current
     val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
@@ -117,7 +118,8 @@ fun Home(
                                 navController.navigate("goals") {
                                     launchSingleTop = true
                                 }
-                            }
+                            },
+                        currency = currency
                     )
                 }
             }
@@ -251,6 +253,7 @@ fun Home(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
+                    .padding(bottom = 25.dp)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.surface)

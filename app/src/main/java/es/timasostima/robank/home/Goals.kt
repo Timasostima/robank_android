@@ -56,7 +56,8 @@ fun Goals(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     goalsList: MutableList<GoalData>,
-    db: Database
+    db: Database,
+    currency: String
 ) {
     val context = LocalContext.current
     with(sharedTransitionScope) {
@@ -74,12 +75,9 @@ fun Goals(
             )
 
         Box (modifier = Modifier.fillMaxSize()){
-            goalsList.forEach {
-                print(it.name + " goal ")
-            }
             if (goalsList.isEmpty()) {
                 Text(
-                    "No goals yet",
+                    stringResource(R.string.no_goals_yet),
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -94,17 +92,14 @@ fun Goals(
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .padding(start = 15.dp, end = 15.dp, top = 70.dp)
-//                    .sharedBounds(
-//                        sharedContentState = rememberSharedContentState(key = "${list[0].name}"),
-//                        animatedVisibilityScope = animatedContentScope
-//                    )
                 ){
                     items(goalsList) {
                         ExpandableGoal(
                             it,
                             modifier = if (goalsList.indexOf(it) == 0) modActive else mod,
                             active = goalsList.indexOf(it) == 0,
-                            db
+                            db,
+                            currency
                         )
                     }
                 }
