@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,10 +48,8 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
-import coil.size.Size as SizeCoil
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.input.InputDialog
 import com.maxkeppeler.sheets.input.models.InputHeader
@@ -68,7 +64,6 @@ import es.timasostima.robank.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,16 +77,16 @@ fun LogIn(
     val context = LocalContext.current
     var showPassword by remember { mutableStateOf(false) }
 
-//    LaunchedEffect(key1 = true){
-//        if (showCredentials){
-//            changeCredVis()
-//            delay(1000)
-//            val result = accountManager.logInCredentialManager()
-//            if (result is LogInResult.Success){
-//                navController.navigate("app")
-//            }
-//        }
-//    }
+    LaunchedEffect(key1 = true){
+        if (showCredentials){
+            changeCredVis()
+            delay(1000)
+            val result = accountManager.logInCredentialManager()
+            if (result is LogInResult.Success){
+                navController.navigate("app")
+            }
+        }
+    }
 
     var showEmailDialog by remember { mutableStateOf(false) }
     var showCredentialsFailureDialog by remember { mutableStateOf(false) }

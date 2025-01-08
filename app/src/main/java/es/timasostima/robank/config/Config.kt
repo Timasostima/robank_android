@@ -1,6 +1,5 @@
 package es.timasostima.robank.config
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +56,10 @@ import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.PreferencesData
 import es.timasostima.robank.enterApp.AccountManager
 import es.timasostima.robank.enterApp.PasswordReset
+import es.timasostima.robank.notifications.RequestNotificationPermission
+import es.timasostima.robank.notifications.checkNotificationPermission
+import es.timasostima.robank.notifications.createNotificationChannel
+import es.timasostima.robank.notifications.showNotification
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +107,6 @@ fun ConfigScreen(
             Picker(
                 listOf(
                     system, "EN \uD83C\uDDEC\uD83C\uDDE7", "ES \uD83C\uDDEA\uD83C\uDDF8",
-                //    "UCR \uD83C\uDDFA\uD83C\uDDE6", "RO \uD83C\uDDF7\uD83C\uDDF4", "RU \uD83C\uDDF7\uD83C\uDDFA"
                 ).sortedBy { it.lowercase().contains(preferences.language) },
                 preferences.language,
                 onPick
@@ -180,6 +182,7 @@ fun ConfigScreen(
             modifier = mod
         ){
             var persistedNotif by rememberSaveable { mutableStateOf(preferences.notifications) }
+            var requestPermissions by rememberSaveable { mutableStateOf(false) }
             Text(stringResource(R.string.notifications))
             Spacer(modifier = Modifier.weight(1f))
             Switch(
@@ -187,6 +190,7 @@ fun ConfigScreen(
                 onCheckedChange = {
                     persistedNotif = it
                     db.changeNotifications(it)
+                    requestPermissions = it
                 },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.primary,
@@ -197,6 +201,16 @@ fun ConfigScreen(
                     uncheckedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.0f),
                 )
             )
+            if (requestPermissions){
+                if (!checkNotificationPermission(context)) {
+                    RequestNotificationPermission(context)
+                }
+                else {
+                    createNotificationChannel(context)
+                    showNotification(context)
+                }
+                requestPermissions = false
+            }
         }
 
         Row (
