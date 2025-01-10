@@ -1,6 +1,7 @@
 package es.timasostima.robank.enterApp
 
 import android.app.Activity
+import androidx.credentials.CreatePasswordRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -50,13 +51,13 @@ class AccountManager (
     ): SignUpResult
     {
         return try {
-//            credentialManager.createCredential(
-//                context = activity,
-//                request = CreatePasswordRequest(
-//                    id = username,
-//                    password = password
-//                )
-//            )
+            credentialManager.createCredential(
+                context = activity,
+                request = CreatePasswordRequest(
+                    id = username,
+                    password = password
+                )
+            )
             auth.createUserWithEmailAndPassword(username, password).await()
             auth.currentUser?.sendEmailVerification()?.await()
 

@@ -77,20 +77,29 @@ fun LogIn(
     val context = LocalContext.current
     var showPassword by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = true){
-        if (showCredentials){
-            changeCredVis()
-            delay(1000)
-            val result = accountManager.logInCredentialManager()
-            if (result is LogInResult.Success){
-                navController.navigate("app")
-            }
-        }
-    }
-
     var showEmailDialog by remember { mutableStateOf(false) }
     var showCredentialsFailureDialog by remember { mutableStateOf(false) }
     var showPasswordResetDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = true){
+        println("almost")
+        if (showCredentials){
+            println("In CM")
+            changeCredVis()
+            delay(1000)
+            val result = accountManager.logInCredentialManager()
+            if (result is LogInResult.Success) {
+                navController.navigate("app/${result.user.uid}") {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                }
+            }
+            else if (result is LogInResult.EmailNotVerified) {
+                showEmailDialog = true
+            }
+        }
+    }
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
