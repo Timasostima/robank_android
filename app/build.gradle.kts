@@ -110,4 +110,9 @@ dependencies {
 
     implementation (libs.coil.compose)
     implementation (libs.coil.gif)
+
+    // retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp3.logging.interceptor)
 }
