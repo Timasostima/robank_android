@@ -55,6 +55,7 @@ import com.maxkeppeler.sheets.state.models.State
 import com.maxkeppeler.sheets.state.models.StateConfig
 import com.maxkeppeler.sheets.state.models.StateSelection
 import es.timasostima.robank.R
+import es.timasostima.robank.database.SignUpResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

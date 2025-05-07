@@ -89,6 +89,6 @@ class GoalManager(
     }
 
     private fun calculateNextIndex(): Int {
-        return (_goalsState.value.maxByOrNull { it.index }?.index ?: 0) + 1
+        return (_goalsState.value.maxByOrNull { it.index }?.index?.plus(1) ?: 0)
     }
 }

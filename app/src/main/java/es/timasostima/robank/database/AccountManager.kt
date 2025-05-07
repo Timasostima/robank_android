@@ -14,7 +14,6 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -22,25 +21,11 @@ import es.timasostima.robank.BuildConfig
 import es.timasostima.robank.api.RetrofitClient
 import es.timasostima.robank.api.RobankUser
 import es.timasostima.robank.database.Database
+import es.timasostima.robank.database.LogInResult
+import es.timasostima.robank.database.SignUpResult
 import kotlinx.coroutines.tasks.await
 import java.security.MessageDigest
 import java.util.UUID
-
-
-sealed interface SignUpResult {
-    data object Success: SignUpResult
-    data object Cancelled : SignUpResult
-    data object AlreadyRegistered: SignUpResult
-    data object Failure : SignUpResult
-}
-
-sealed interface LogInResult {
-    data class Success(val user: FirebaseUser) : LogInResult
-    data object Cancelled : LogInResult
-    data object Failure : LogInResult
-    data object DoesNotExist : LogInResult
-    data object EmailNotVerified : LogInResult
-}
 
 class AccountManager (
     private val activity: Activity
