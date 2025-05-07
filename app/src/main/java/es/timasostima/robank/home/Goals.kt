@@ -47,6 +47,7 @@ import com.maxkeppeler.sheets.input.models.InputTextFieldType
 import com.maxkeppeler.sheets.input.models.ValidationResult
 import es.timasostima.robank.R
 import es.timasostima.robank.database.Database
+import es.timasostima.robank.database.GoalDTO
 import es.timasostima.robank.database.GoalData
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -199,7 +200,12 @@ internal fun CreateAGoal(
                 val name = result.getString("0") ?: ""
                 val price = result.getString("1") ?: ""
                 if (name.isNotBlank() && price.isNotBlank()) {
-                    db.createGoal(GoalData(
+//                    db.createGoal(GoalData(
+//                        name.trim(),
+//                        price.toDoubleOrNull() ?: 0.0,
+//                        (goalsList.maxByOrNull { it.index }?.index ?: 0) + 1
+//                    ))
+                    db.createGoal2(GoalDTO(
                         name.trim(),
                         price.toDoubleOrNull() ?: 0.0,
                         (goalsList.maxByOrNull { it.index }?.index ?: 0) + 1

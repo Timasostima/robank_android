@@ -100,7 +100,7 @@ fun Home(
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
                 val goal =
-                    goalsList.firstOrNull() ?: GoalData(stringResource(R.string.example), 0.0, 0)
+                    goalsList.firstOrNull() ?: GoalData(0, stringResource(R.string.example), 0.0, 0) //////////////////////////////////////////////////////////////////////////////////
                 with(sharedTransitionScope) {
                     BasicGoal(
                         goal = goal,

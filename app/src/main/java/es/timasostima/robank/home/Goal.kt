@@ -83,7 +83,8 @@ fun ExpandableGoal(
 
             Button(
                 onClick = {
-                    db.deleteGoal(goal)
+//                    db.deleteGoal(goal)
+                    db.deleteGoal2(goal.id)
                 },
                 colors = ButtonDefaults.buttonColors().copy(
                     containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
@@ -124,7 +125,8 @@ fun ExpandableGoal(
             )
             Button(
                 onClick = {
-                    db.updateGoal(goal.name, tempName, tempPrice)
+//                    db.updateGoal(goal.name, tempName, tempPrice)
+                    db.updateGoal2(goal.id)
                     expanded = false
                 },
                 modifier = Modifier
