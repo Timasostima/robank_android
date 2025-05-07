@@ -59,7 +59,7 @@ import es.timasostima.robank.database.BillData
 import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalData
-import es.timasostima.robank.home.GoalManager
+import es.timasostima.robank.database.GoalManager
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter

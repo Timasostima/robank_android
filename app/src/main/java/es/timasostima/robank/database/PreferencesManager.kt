@@ -1,8 +1,8 @@
-package es.timasostima.robank.config
+package es.timasostima.robank.database
 
 import android.util.Log
 import es.timasostima.robank.api.RetrofitClient
-import es.timasostima.robank.database.PreferencesData
+import es.timasostima.robank.config.ThemeMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +29,7 @@ class PreferencesManager(
             try {
                 val prefs = apiClient.getPreferences()
                 _preferencesState.value = prefs
-                _themeState.value = ThemeMode.fromString(prefs.theme)
+                _themeState.value = ThemeMode.Companion.fromString(prefs.theme)
             } catch (e: Exception) {
                 Log.e("PreferencesManager", "Error loading preferences from API", e)
             }

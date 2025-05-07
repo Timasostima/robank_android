@@ -58,6 +58,7 @@ import es.timasostima.robank.charts.buttomBorder
 import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.PreferencesData
+import es.timasostima.robank.database.PreferencesManager
 import es.timasostima.robank.enterApp.AccountManager
 import es.timasostima.robank.enterApp.PasswordReset
 import es.timasostima.robank.notifications.RequestNotificationPermission

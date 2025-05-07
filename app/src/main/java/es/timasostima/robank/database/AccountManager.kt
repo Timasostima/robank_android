@@ -20,15 +20,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import es.timasostima.robank.BuildConfig
 import es.timasostima.robank.api.RetrofitClient
-import es.timasostima.robank.api.RobankApiService
 import es.timasostima.robank.api.RobankUser
 import es.timasostima.robank.database.Database
 import kotlinx.coroutines.tasks.await
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.security.MessageDigest
 import java.util.UUID
-import kotlin.printStackTrace
 
 
 sealed interface SignUpResult {

@@ -48,7 +48,7 @@ import com.maxkeppeler.sheets.input.models.ValidationResult
 import es.timasostima.robank.R
 import es.timasostima.robank.database.GoalData
 import es.timasostima.robank.database.GoalDTO
-import es.timasostima.robank.home.GoalManager
+import es.timasostima.robank.database.GoalManager
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable

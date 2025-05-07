@@ -14,18 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,18 +34,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import es.timasostima.robank.charts.Charts
 import es.timasostima.robank.config.ConfigScreen
-import es.timasostima.robank.config.PreferencesManager
+import es.timasostima.robank.database.PreferencesManager
 import es.timasostima.robank.config.ThemeMode
 import es.timasostima.robank.database.BillData
 import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.database.Database
-import es.timasostima.robank.database.GoalData
-import es.timasostima.robank.database.PreferencesData
 import es.timasostima.robank.enterApp.AccountManager
-import es.timasostima.robank.home.GoalManager
+import es.timasostima.robank.database.GoalManager
 import es.timasostima.robank.home.HomeScreen
 import es.timasostima.robank.ui.theme.RobankTheme
-import java.util.Locale
 
 @Composable
 fun App(
@@ -59,8 +51,6 @@ fun App(
     accountManager: AccountManager,
     loginNav: NavHostController
 ) {
-    val userId = db.userId
-
     val preferencesManager = remember {
         PreferencesManager()
     }
@@ -179,7 +169,7 @@ fun Modifier.topBorder(strokeWidth: Dp, color: Color) = composed(
 
 @Preview
 @Composable
-fun ButtomBar() {
+fun BottomBar() {
     RobankTheme {
         MainNavigationBar(rememberNavController(), null)
     }

@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import es.timasostima.robank.R
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalData
-import es.timasostima.robank.home.GoalManager
+import es.timasostima.robank.database.GoalManager
 
 @Composable
 fun ExpandableGoal(
