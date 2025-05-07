@@ -55,11 +55,11 @@ import com.maxkeppeler.sheets.color.models.MultipleColors
 import com.maxkeppeler.sheets.color.models.SingleColor
 import es.timasostima.robank.R
 import es.timasostima.robank.config.CategoryPicker
-import es.timasostima.robank.database.BillData
-import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.database.Database
-import es.timasostima.robank.database.GoalData
 import es.timasostima.robank.database.GoalManager
+import es.timasostima.robank.dto.BillData
+import es.timasostima.robank.dto.CategoryData
+import es.timasostima.robank.dto.GoalData
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -72,7 +72,6 @@ fun Home(
     animatedContentScope: AnimatedContentScope,
     goalsList: List<GoalData>,
     categoriesList: List<CategoryData>,
-    goalManager: GoalManager,
     db: Database,
     currency: String
 ) {

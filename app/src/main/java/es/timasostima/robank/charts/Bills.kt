@@ -37,7 +37,7 @@ import android.graphics.Color as colorString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import es.timasostima.robank.database.BillData
+import es.timasostima.robank.dto.BillData
 import es.timasostima.robank.topBorder
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.models.BarProperties

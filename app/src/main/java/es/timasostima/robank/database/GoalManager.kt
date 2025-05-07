@@ -2,6 +2,8 @@ package es.timasostima.robank.database
 
 import android.util.Log
 import es.timasostima.robank.api.RetrofitClient
+import es.timasostima.robank.dto.GoalDTO
+import es.timasostima.robank.dto.GoalData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

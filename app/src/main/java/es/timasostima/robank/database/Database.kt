@@ -1,7 +1,5 @@
 package es.timasostima.robank.database
 
-import android.app.LocaleManager
-import android.content.Context
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,48 +13,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import es.timasostima.robank.api.RetrofitClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
-class CategoryData(var name: String, var color: String) {
-    constructor() : this("", "")
-}
-
-data class GoalData(
-    var id: Int = 0,
-    var name: String,
-    var price: Double,
-    var index: Int
-) {
-    constructor() : this(0, "", 0.0, 0)
-}
-
-data class GoalDTO(
-    var name: String,
-    var price: Double,
-    var index: Int
-)
-
-data class BillData(
-    var name: String,
-    var amount: Double,
-    var category: CategoryData,
-    var date: String,
-    var time: String
-) {
-    constructor() : this("", 0.0, CategoryData(), "", "")
-}
-
-data class PreferencesData(
-    var id : Int = 0,
-    var language: String,
-    var currency: String,
-    var theme: String,
-    var notifications: Boolean
-) {
-    constructor() : this(0, "", "", "", false)
-}
+import es.timasostima.robank.dto.BillData
+import es.timasostima.robank.dto.CategoryData
 
 val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")

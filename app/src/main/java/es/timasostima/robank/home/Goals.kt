@@ -46,9 +46,9 @@ import com.maxkeppeler.sheets.input.models.InputTextField
 import com.maxkeppeler.sheets.input.models.InputTextFieldType
 import com.maxkeppeler.sheets.input.models.ValidationResult
 import es.timasostima.robank.R
-import es.timasostima.robank.database.GoalData
-import es.timasostima.robank.database.GoalDTO
 import es.timasostima.robank.database.GoalManager
+import es.timasostima.robank.dto.GoalDTO
+import es.timasostima.robank.dto.GoalData
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable

@@ -1,8 +1,8 @@
 package es.timasostima.robank.api
 
-import es.timasostima.robank.database.GoalDTO
-import es.timasostima.robank.database.GoalData
-import es.timasostima.robank.database.PreferencesData
+import es.timasostima.robank.dto.GoalDTO
+import es.timasostima.robank.dto.GoalData
+import es.timasostima.robank.dto.PreferencesData
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -26,6 +26,7 @@ interface RobankApiService {
 
     @GET("user/preferences")
     suspend fun getPreferences(): PreferencesData
+
 
     @GET("goals")
     suspend fun getGoals(): Response<List<GoalData>>

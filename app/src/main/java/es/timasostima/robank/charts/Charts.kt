@@ -35,8 +35,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import es.timasostima.robank.R
-import es.timasostima.robank.database.BillData
-import es.timasostima.robank.database.CategoryData
+import es.timasostima.robank.dto.BillData
+import es.timasostima.robank.dto.CategoryData
 
 @Composable
 fun Charts(

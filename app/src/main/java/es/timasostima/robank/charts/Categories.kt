@@ -39,8 +39,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import es.timasostima.robank.R
-import es.timasostima.robank.database.BillData
-import es.timasostima.robank.database.CategoryData
+import es.timasostima.robank.dto.BillData
+import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.topBorder
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie

@@ -1,6 +1,5 @@
 package es.timasostima.robank.config
 
-import android.R.attr.theme
 import android.app.LocaleManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,20 +54,14 @@ import com.maxkeppeler.sheets.state.models.State
 import com.maxkeppeler.sheets.state.models.StateConfig
 import es.timasostima.robank.R
 import es.timasostima.robank.charts.buttomBorder
-import es.timasostima.robank.database.CategoryData
-import es.timasostima.robank.database.Database
-import es.timasostima.robank.database.PreferencesData
 import es.timasostima.robank.database.PreferencesManager
+import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.enterApp.AccountManager
 import es.timasostima.robank.enterApp.PasswordReset
 import es.timasostima.robank.notifications.RequestNotificationPermission
 import es.timasostima.robank.notifications.checkNotificationPermission
 import es.timasostima.robank.notifications.createNotificationChannel
 import es.timasostima.robank.notifications.showNotification
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

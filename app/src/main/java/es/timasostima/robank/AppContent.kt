@@ -36,11 +36,11 @@ import es.timasostima.robank.charts.Charts
 import es.timasostima.robank.config.ConfigScreen
 import es.timasostima.robank.database.PreferencesManager
 import es.timasostima.robank.config.ThemeMode
-import es.timasostima.robank.database.BillData
-import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.enterApp.AccountManager
 import es.timasostima.robank.database.GoalManager
+import es.timasostima.robank.dto.BillData
+import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.home.HomeScreen
 import es.timasostima.robank.ui.theme.RobankTheme
 

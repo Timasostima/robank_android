@@ -1,6 +1,5 @@
 package es.timasostima.robank.home
 
-import android.icu.util.Currency
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,9 +35,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import es.timasostima.robank.R
-import es.timasostima.robank.database.Database
-import es.timasostima.robank.database.GoalData
 import es.timasostima.robank.database.GoalManager
+import es.timasostima.robank.dto.GoalData
 
 @Composable
 fun ExpandableGoal(
