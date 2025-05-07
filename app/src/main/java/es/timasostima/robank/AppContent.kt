@@ -47,6 +47,7 @@ import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalData
 import es.timasostima.robank.database.PreferencesData
 import es.timasostima.robank.enterApp.AccountManager
+import es.timasostima.robank.home.GoalManager
 import es.timasostima.robank.home.HomeScreen
 import es.timasostima.robank.ui.theme.RobankTheme
 import java.util.Locale
@@ -63,7 +64,6 @@ fun App(
     val preferencesManager = remember {
         PreferencesManager()
     }
-
     // Observe preferences from the PreferencesManager
     val preferences by preferencesManager.preferencesState.collectAsState()
     val theme by preferencesManager.themeState.collectAsState()
@@ -74,11 +74,11 @@ fun App(
 
     val categoriesList: MutableList<CategoryData> = mutableListOf()
     val billsList: MutableList<BillData> = mutableListOf()
-    val goalsList: SnapshotStateList<GoalData> = remember { mutableStateListOf() }
+    val goalManager = remember { GoalManager() }
+    val goals by goalManager.goalsState.collectAsState()
 
     db.loadCategories(categoriesList)
     db.loadBills(billsList)
-    db.loadGoals2(goalsList)
 
     val mainController = rememberNavController()
     val navBackStack by mainController.currentBackStackEntryAsState()
@@ -94,13 +94,13 @@ fun App(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
-                    HomeScreen(categoriesList, goalsList, db, preferences?.currency ?: "eur")
+                HomeScreen(categoriesList, goals, goalManager, db, preferences?.currency ?: "eur")
             }
             composable("config") {
                 ConfigScreen(changeMode, loginNav, accountManager, preferencesManager)
             }
             composable("charts") {
-                    Charts(billsList, categoriesList, preferences?.currency ?: "eur")
+                Charts(billsList, categoriesList, preferences?.currency ?: "eur")
             }
         }
     }
