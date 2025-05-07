@@ -1,6 +1,7 @@
 package es.timasostima.robank.enterApp
 
 import android.app.Activity
+import android.util.Log
 import androidx.credentials.CreatePasswordRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -18,10 +19,17 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import es.timasostima.robank.BuildConfig
+import es.timasostima.robank.api.RetrofitClient
+import es.timasostima.robank.api.RobankApiService
+import es.timasostima.robank.api.RobankUser
 import es.timasostima.robank.database.Database
 import kotlinx.coroutines.tasks.await
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.security.MessageDigest
 import java.util.UUID
+import kotlin.printStackTrace
+
 
 sealed interface SignUpResult {
     data object Success: SignUpResult
@@ -51,34 +59,47 @@ class AccountManager (
     ): SignUpResult
     {
         return try {
-            credentialManager.createCredential(
-                context = activity,
-                request = CreatePasswordRequest(
-                    id = username,
-                    password = password
+            try {
+                credentialManager.createCredential(
+                    context = activity,
+                    request = CreatePasswordRequest(
+                        id = username,
+                        password = password
+                    )
                 )
-            )
+            } catch (e: CreateCredentialCancellationException) {
+                return SignUpResult.Cancelled
+            } catch (e: CreateCredentialException) {
+                Log.w("AccountManager", "Credential Manager error: ${e.message}")
+            }
+
             auth.createUserWithEmailAndPassword(username, password).await()
             auth.currentUser?.sendEmailVerification()?.await()
 
             Database(auth.currentUser!!.uid).createUserData()
-            return SignUpResult.Success
-
-        } catch (e: CreateCredentialCancellationException){
-            e.printStackTrace()
-            SignUpResult.Cancelled
-        } catch (e: FirebaseAuthUserCollisionException){
+            try {
+                val backendUser = RobankUser(
+                    uid = auth.currentUser!!.uid,
+                    email = username,
+                    name = username.substringBefore('@')
+                )
+                val response = RetrofitClient.apiService.registerUser(backendUser)
+                if (!response.isSuccessful) {
+                    Log.e("AccountManager", "Backend registration failed: ${response.errorBody()?.string()}")
+                    return SignUpResult.Failure
+                }
+            } catch (e: Exception) {
+                Log.e("AccountManager", "Error with backend registration", e)
+                return SignUpResult.Failure
+            }
+            SignUpResult.Success
+        } catch (e: FirebaseAuthUserCollisionException) {
             e.printStackTrace()
             SignUpResult.AlreadyRegistered
-        }catch (e: CreateCredentialException){
+        } catch (e: Exception) {
             e.printStackTrace()
             SignUpResult.Failure
         }
-        catch (e: Exception){
-            e.printStackTrace()
-            SignUpResult.Failure
-        }
-
     }
 
     suspend fun logInCredentialManager(): LogInResult
@@ -109,7 +130,6 @@ class AccountManager (
                     if (!task.isSuccessful) result = LogInResult.Failure
             }.await()
             if (result != null) return result!! //means it is not successful
-
 
             if (!checkEmailVerification()){
                 return LogInResult.EmailNotVerified

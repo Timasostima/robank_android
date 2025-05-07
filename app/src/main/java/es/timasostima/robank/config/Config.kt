@@ -1,5 +1,7 @@
 package es.timasostima.robank.config
 
+import android.R.attr.theme
+import android.app.LocaleManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +31,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,20 +64,31 @@ import es.timasostima.robank.notifications.RequestNotificationPermission
 import es.timasostima.robank.notifications.checkNotificationPermission
 import es.timasostima.robank.notifications.createNotificationChannel
 import es.timasostima.robank.notifications.showNotification
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfigScreen(
+    changeMode: (Boolean?) -> Unit,
     loginNav: NavHostController,
-    preferences: PreferencesData,
-    db: Database,
-    accountManager: AccountManager
+    accountManager: AccountManager,
+    preferencesManager: PreferencesManager,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showPasswordResetDialog by remember { mutableStateOf(false) }
 
-    Column (modifier = Modifier
+    val theme by preferencesManager.themeState.collectAsState()
+    val preferences by preferencesManager.preferencesState.collectAsState()
+
+    LaunchedEffect(theme) {
+        changeMode(ThemeMode.toBooleanForDarkMode(theme))
+    }
+
+    Column(modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colorScheme.background)
         .padding(top = 30.dp)
@@ -88,49 +103,66 @@ fun ConfigScreen(
             .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 20.dp)
             .buttomBorder(1.dp, MaterialTheme.colorScheme.onSecondaryContainer)
-        Row (
+
+        // Language Row
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = mod
-        ){
+        ) {
             val system = stringResource(R.string.system)
             val onPick: (String) -> Unit = { item ->
-                if (item == system) {
-                    db.changeLanguage("system")
-                }
-                else{
-                    val name = item.substring(0, item.length - 5)
-                    db.changeLanguage(name)
-                }
+                val language = if (item == system) "system" else item.substring(0, item.length - 5)
+                preferencesManager.updateLanguage(language)
+                context
+                    .getSystemService(LocaleManager::class.java)
+                    .applicationLocales =
+                    android.os.LocaleList(
+                        java.util.Locale(
+                            language.lowercase(),
+                            language.uppercase()
+                        )
+                    )
             }
             Text(stringResource(R.string.language))
             Spacer(modifier = Modifier.weight(1f))
-            Picker(
-                listOf(
-                    system, "EN \uD83C\uDDEC\uD83C\uDDE7", "ES \uD83C\uDDEA\uD83C\uDDF8",
-                ).sortedBy { it.lowercase().contains(preferences.language) },
-                preferences.language,
-                onPick
-            )
+
+            // Only render if preferences data is available
+            preferences?.let { prefs ->
+                Picker(
+                    listOf(
+                        system, "EN \uD83C\uDDEC\uD83C\uDDE7", "ES \uD83C\uDDEA\uD83C\uDDF8",
+                    ).sortedBy { it.lowercase().contains(prefs.language) },
+                    prefs.language,
+                    onPick
+                )
+            }
         }
-        Row (
+
+        // Currency Row
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = mod
-        ){
+        ) {
             val onPick: (String) -> Unit = { item ->
-                db.changeCurrency(item)
+                preferencesManager.updateCurrency(item)
             }
             Text(stringResource(R.string.currency))
             Spacer(modifier = Modifier.weight(1f))
-            Picker(
-                listOf("eur", "usd", "rub").sortedBy { it.contains(preferences.currency) },
-                preferences.currency,
-                onPick
-            )
+
+            preferences?.let { prefs ->
+                Picker(
+                    listOf("eur", "usd", "rub").sortedBy { it.contains(prefs.currency) },
+                    prefs.currency,
+                    onPick
+                )
+            }
         }
-        Row (
+
+        // Theme Row
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = mod
-        ){
+        ) {
             Text(stringResource(R.string.theme))
             Spacer(modifier = Modifier.weight(1f))
 
@@ -138,20 +170,10 @@ fun ConfigScreen(
             val moon = painterResource(R.drawable.moon)
             val systemTheme = painterResource(R.drawable.system_theme)
 
-            var theme by remember { mutableStateOf(preferences.theme) }
-            val changeIcon: () -> Unit = {
-                theme = when (theme) {
-                    "system" -> "night"
-                    "night" -> "light"
-                    "light" -> "system"
-                    else -> "system"
-                }
-            }
             val icon = when (theme) {
-                "system" -> systemTheme
-                "night" -> moon
-                "light" -> sun
-                else -> systemTheme
+                ThemeMode.SYSTEM -> systemTheme
+                ThemeMode.DARK -> moon
+                ThemeMode.LIGHT -> sun
             }
 
             Icon(
@@ -161,51 +183,44 @@ fun ConfigScreen(
                     .padding(7.dp)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(10.dp))
-                    .clickable {
-                        changeIcon()
-                        db.changeTheme(
-                            when (preferences.theme) {
-                                "system" -> "night"
-                                "night" -> "light"
-                                "light" -> "system"
-                                else -> "system"
-                            }
-                        )
-                    }
+                    .clickable { preferencesManager.cycleTheme() }
                     .aspectRatio(1f)
                     .padding(10.dp),
             )
         }
 
-        Row (
+        // Notifications Row
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = mod
-        ){
-            var persistedNotif by rememberSaveable { mutableStateOf(preferences.notifications) }
+        ) {
             var requestPermissions by rememberSaveable { mutableStateOf(false) }
+
             Text(stringResource(R.string.notifications))
             Spacer(modifier = Modifier.weight(1f))
-            Switch(
-                checked = persistedNotif,
-                onCheckedChange = {
-                    persistedNotif = it
-                    db.changeNotifications(it)
-                    requestPermissions = it
-                },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.primary,
-                    checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                    checkedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.0f),
-                    uncheckedThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-                    uncheckedTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
-                    uncheckedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.0f),
+
+            preferences?.let { prefs ->
+                Switch(
+                    checked = prefs.notifications,
+                    onCheckedChange = { enabled ->
+                        preferencesManager.updateNotifications(enabled)
+                        requestPermissions = enabled
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        checkedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.0f),
+                        uncheckedThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                        uncheckedTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                        uncheckedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.0f),
+                    )
                 )
-            )
-            if (requestPermissions){
+            }
+
+            if (requestPermissions) {
                 if (!checkNotificationPermission(context)) {
                     RequestNotificationPermission(context)
-                }
-                else {
+                } else {
                     createNotificationChannel(context)
                     showNotification(context)
                 }
@@ -213,10 +228,11 @@ fun ConfigScreen(
             }
         }
 
-        Row (
+        // Password Row
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = mod
-        ){
+        ) {
             Text(stringResource(R.string.change_the_password))
             Spacer(modifier = Modifier.weight(1f))
             Text(
@@ -230,17 +246,24 @@ fun ConfigScreen(
             )
         }
 
-        Box(modifier = Modifier.fillMaxSize()){
+        Box(modifier = Modifier.fillMaxSize()) {
             Text(stringResource(R.string.coming_soon), fontSize = 40.sp, modifier = Modifier.align(Alignment.Center))
         }
     }
 
-
+    // Password Reset Dialog
     var showPasswordResetConfirmation by remember { mutableStateOf(false) }
-    if (showPasswordResetDialog){
-        PasswordReset(context, scope, accountManager, {showPasswordResetConfirmation = true}) { showPasswordResetDialog = false }
+    if (showPasswordResetDialog) {
+        PasswordReset(
+            context,
+            scope,
+            accountManager,
+            { showPasswordResetConfirmation = true },
+            { showPasswordResetDialog = false }
+        )
     }
-    if (showPasswordResetConfirmation){
+
+    if (showPasswordResetConfirmation) {
         StateDialog(
             state = rememberUseCaseState(
                 visible = true,

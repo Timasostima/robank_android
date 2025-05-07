@@ -2,7 +2,6 @@ package es.timasostima.robank.database
 
 import android.app.LocaleManager
 import android.content.Context
-import android.os.Build
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,18 +14,29 @@ import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import es.timasostima.robank.api.RetrofitClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class CategoryData(var name: String, var color: String) {
     constructor() : this("", "")
 }
 
 data class GoalData(
+    var id: Int = 0,
     var name: String,
     var price: Double,
     var index: Int
 ) {
-    constructor() : this("", 0.0, 0)
+    constructor() : this(0, "", 0.0, 0)
 }
+
+data class GoalDTO(
+    var name: String,
+    var price: Double,
+    var index: Int
+)
 
 data class BillData(
     var name: String,
@@ -39,25 +49,26 @@ data class BillData(
 }
 
 data class PreferencesData(
+    var id : Int = 0,
     var language: String,
     var currency: String,
     var theme: String,
     var notifications: Boolean
 ) {
-    constructor() : this("", "", "", false)
+    constructor() : this(0, "", "", "", false)
 }
 
 val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 class Database(
-    private val userId: String
+    val userId: String
 ) {
     private val db: FirebaseDatabase = Firebase.database(BuildConfig.FIREBASE_DATABASE)
+    private val client = RetrofitClient.apiService
 
     fun createUserData() {
-        db
-            .getReference("users/$userId/preferences")
+        db.getReference("users/$userId/preferences")
             .setValue(
                 mapOf(
                     "language" to "system",
@@ -67,7 +78,6 @@ class Database(
                 )
             )
     }
-
     fun loadCategories(categories: MutableList<CategoryData>) {
         db.getReference("users/$userId/categories")
             .addValueEventListener(object : ValueEventListener {
@@ -127,8 +137,28 @@ class Database(
         })
     }
 
-    fun createGoal(goal: GoalData) {
-        db.getReference("users/$userId/goals").push().setValue(goal)
+    fun loadGoals2(goals: MutableList<GoalData>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            goals.clear()
+            val res = client.getGoals()
+            for (i in res.indices) {
+                goals.add(GoalData(res[i].id, res[i].name, res[i].price, res[i].index))
+            }
+        }
+    }
+
+//    fun createGoal(goal: GoalData) {
+//        db.getReference("users/$userId/goals").push().setValue(goal)
+//    }
+
+    fun createGoal2(goal: GoalDTO) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                client.createGoal(goal)
+            } catch (e: Exception) {
+                Log.e("Database", "Error deleting a goal", e)
+            }
+        }
     }
 
     fun deleteGoal(goal: GoalData) {
@@ -137,6 +167,15 @@ class Database(
                 snapshot.children.forEach {
                     it.ref.removeValue()
                 }
+        }
+    }
+    fun deleteGoal2(id: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                client.deleteGoal(id)
+            } catch (e: Exception) {
+                Log.e("Database", "Error deleting a goal", e)
+            }
         }
     }
 
@@ -150,62 +189,13 @@ class Database(
             Log.w("TAG", "Failed to read value.", error)
         }
     }
-
-    fun loadPreferences(
-        preferences: PreferencesData,
-        changeMode: (Boolean?) -> Unit,
-        context: Context
-    ) {
-        db.getReference("users/$userId/preferences")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val value = snapshot.getValue<PreferencesData>()
-                    if (value != null) {
-                        preferences.language = value.language
-                        preferences.currency = value.currency
-                        preferences.theme = value.theme
-                        preferences.notifications = value.notifications
-
-                        changeMode(
-                            when (preferences.theme) {
-                                "system" -> null
-                                "dark" -> true
-                                "light" -> false
-                                else -> null
-                            }
-                        )
-                        context
-                            .getSystemService(LocaleManager::class.java)
-                            .applicationLocales =
-                            android.os.LocaleList(
-                                java.util.Locale(
-                                    value.language.lowercase(),
-                                    value.language.uppercase()
-                                )
-                            )
-                    }
-
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.w("TAG", "Failed to read value.", error.toException())
-                }
-            })
-    }
-
-    fun changeTheme(theme: String) {
-        db.getReference("users/$userId/preferences/theme").setValue(theme)
-    }
-
-    fun changeLanguage(language: String) {
-        db.getReference("users/$userId/preferences/language").setValue(language)
-    }
-
-    fun changeCurrency(currency: String) {
-        db.getReference("users/$userId/preferences/currency").setValue(currency)
-    }
-
-    fun changeNotifications(permitted: Boolean) {
-        db.getReference("users/$userId/preferences/notifications").setValue(permitted)
+    fun updateGoal2(id: Int){
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                client.updateGoal(id)
+            } catch (e: Exception) {
+                Log.e("Database", "Error updating a goal", e)
+            }
+        }
     }
 }
