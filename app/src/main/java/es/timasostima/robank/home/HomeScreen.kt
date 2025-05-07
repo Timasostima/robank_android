@@ -23,16 +23,18 @@ import androidx.navigation.compose.rememberNavController
 import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalData
+import es.timasostima.robank.home.GoalManager
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreen(
-    categoriesList: MutableList<CategoryData>,
-    goalsList: MutableList<GoalData>,
+    categoriesList: List<CategoryData>,
+    goalsList: List<GoalData>,
+    goalManager: GoalManager,
     db: Database,
     currency: String
 ) {
-    val curSym = when (currency){
+    val curSym = when (currency) {
         "usd" -> "$"
         "eur" -> "€"
         "rub" -> "₽"
@@ -51,6 +53,7 @@ fun HomeScreen(
                     this@composable,
                     goalsList,
                     categoriesList,
+                    goalManager,
                     db,
                     curSym
                 )
@@ -61,15 +64,13 @@ fun HomeScreen(
                     this@SharedTransitionLayout,
                     this@composable,
                     goalsList,
-                    db,
+                    goalManager,
                     curSym
                 )
             }
         }
     }
 }
-
-
 
 @Composable
 fun LinearDeterminateIndicator(modifier: Modifier) {
@@ -81,7 +82,7 @@ fun LinearDeterminateIndicator(modifier: Modifier) {
         modifier = modifier.fillMaxWidth()
     ) {
         LinearProgressIndicator(
-            progress = { currentProgress },
+            progress = currentProgress,
             trackColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.7f),
             modifier = Modifier
                 .fillMaxWidth()

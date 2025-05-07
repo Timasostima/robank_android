@@ -38,27 +38,28 @@ import androidx.compose.ui.unit.sp
 import es.timasostima.robank.R
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalData
+import es.timasostima.robank.home.GoalManager
 
 @Composable
 fun ExpandableGoal(
-    goal : GoalData,
+    goal: GoalData,
     modifier: Modifier = Modifier,
-    active : Boolean = false,
-    db : Database,
+    active: Boolean = false,
+    goalManager: GoalManager,
     currency: String
-){
+) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.surface)
-    ){
-        Box (
+    ) {
+        Box(
             modifier = modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
-        ){
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.buggati),
                 contentDescription = null,
@@ -70,7 +71,7 @@ fun ExpandableGoal(
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f))
                     .padding(vertical = 5.dp, horizontal = 15.dp)
-            ){
+            ) {
                 Text(
                     goal.name,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -82,10 +83,7 @@ fun ExpandableGoal(
             }
 
             Button(
-                onClick = {
-//                    db.deleteGoal(goal)
-                    db.deleteGoal2(goal.id)
-                },
+                onClick = { goalManager.deleteGoal(goal.id) },
                 colors = ButtonDefaults.buttonColors().copy(
                     containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
                 ),
@@ -94,18 +92,18 @@ fun ExpandableGoal(
                 modifier = Modifier
                     .size(40.dp)
                     .align(Alignment.TopEnd)
-            ){
+            ) {
                 Text("X", fontSize = 20.sp, color = Color(0xFFFA5555), fontWeight = FontWeight.Bold)
             }
             if (active)
                 LinearDeterminateIndicator(modifier = Modifier.align(Alignment.BottomStart))
         }
-        if (expanded){
+        if (expanded) {
             var tempName by remember { mutableStateOf(goal.name) }
             var tempPrice by remember { mutableDoubleStateOf(goal.price) }
             OutlinedTextField(
                 value = tempName,
-                onValueChange = {tempName = it},
+                onValueChange = { tempName = it },
                 label = { Text("Name", fontSize = 12.sp) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -125,14 +123,13 @@ fun ExpandableGoal(
             )
             Button(
                 onClick = {
-//                    db.updateGoal(goal.name, tempName, tempPrice)
-                    db.updateGoal2(goal.id)
+                    goalManager.updateGoal(goal.id, tempName, tempPrice)
                     expanded = false
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
-            ){
+            ) {
                 Text(stringResource(R.string.save))
             }
         }
@@ -141,13 +138,13 @@ fun ExpandableGoal(
 
 @Composable
 fun BasicGoal(
-    goal : GoalData,
+    goal: GoalData,
     modifier: Modifier = Modifier,
     currency: String
-){
-    Box (
+) {
+    Box(
         modifier = modifier
-    ){
+    ) {
         Image(
             painter = painterResource(id = R.drawable.buggati),
             contentDescription = null,
@@ -159,7 +156,7 @@ fun BasicGoal(
                 .clip(RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f))
                 .padding(vertical = 5.dp, horizontal = 15.dp)
-        ){
+        ) {
             Text(
                 goal.name,
                 color = MaterialTheme.colorScheme.onSurface,

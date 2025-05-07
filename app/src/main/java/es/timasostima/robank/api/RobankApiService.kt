@@ -28,13 +28,13 @@ interface RobankApiService {
     suspend fun getPreferences(): PreferencesData
 
     @GET("goals")
-    suspend fun getGoals(): List<GoalData>
+    suspend fun getGoals(): Response<List<GoalData>>
 
     @POST("goals")
-    suspend fun createGoal(@Body goal: GoalDTO) : Response<Unit>
+    suspend fun createGoal(@Body goal: GoalDTO): Response<GoalData>
 
     @PUT("goals/{id}")
-    suspend fun updateGoal(@Path("id") id: Int): Response<Unit>
+    suspend fun updateGoal(@Path("id") id: Int, @Body goal: GoalDTO): Response<Unit>
 
     @DELETE("goals/{id}")
     suspend fun deleteGoal(@Path("id") id: Int): Response<Unit>

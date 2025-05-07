@@ -46,9 +46,9 @@ import com.maxkeppeler.sheets.input.models.InputTextField
 import com.maxkeppeler.sheets.input.models.InputTextFieldType
 import com.maxkeppeler.sheets.input.models.ValidationResult
 import es.timasostima.robank.R
-import es.timasostima.robank.database.Database
-import es.timasostima.robank.database.GoalDTO
 import es.timasostima.robank.database.GoalData
+import es.timasostima.robank.database.GoalDTO
+import es.timasostima.robank.home.GoalManager
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -56,8 +56,8 @@ fun Goals(
     navController: NavHostController,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    goalsList: MutableList<GoalData>,
-    db: Database,
+    goalsList: List<GoalData>,
+    goalManager: GoalManager,
     currency: String
 ) {
     val context = LocalContext.current
@@ -75,7 +75,7 @@ fun Goals(
                 RoundedCornerShape(10.dp)
             )
 
-        Box (modifier = Modifier.fillMaxSize()){
+        Box(modifier = Modifier.fillMaxSize()) {
             if (goalsList.isEmpty()) {
                 Text(
                     stringResource(R.string.no_goals_yet),
@@ -85,27 +85,25 @@ fun Goals(
                         .padding(top = 100.dp)
                         .fillMaxWidth(),
                 )
-            }
-            else{
-                LazyColumn (
+            } else {
+                LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .padding(start = 15.dp, end = 15.dp, top = 70.dp)
-                ){
+                ) {
                     items(goalsList) {
                         ExpandableGoal(
                             it,
                             modifier = if (goalsList.indexOf(it) == 0) modActive else mod,
                             active = goalsList.indexOf(it) == 0,
-                            db,
-                            currency
+                            goalManager = goalManager,
+                            currency = currency
                         )
                     }
                 }
             }
-
 
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
@@ -135,15 +133,14 @@ fun Goals(
                     .padding(10.dp)
                     .height(60.dp)
                     .width(60.dp)
-            ){
+            ) {
                 Text("+", fontSize = 23.sp)
             }
-            if (showGoalCreation){
+            if (showGoalCreation) {
                 CreateAGoal(
                     closeSelection = { showGoalCreation = false },
-                    db,
-                    goalsList,
-                    context
+                    goalManager = goalManager,
+                    context = context
                 )
             }
         }
@@ -154,8 +151,7 @@ fun Goals(
 @Composable
 internal fun CreateAGoal(
     closeSelection: () -> Unit,
-    db: Database,
-    goalsList: MutableList<GoalData>,
+    goalManager: GoalManager,
     context: Context
 ) {
     val inputOptions = listOf(
@@ -181,7 +177,8 @@ internal fun CreateAGoal(
                 else if (value.toDoubleOrNull() == null) ValidationResult.Invalid(
                     context.getString(
                         R.string.price_must_be_a_number
-                    ))
+                    )
+                )
                 else if (value.toDouble() <= 0) ValidationResult.Invalid(
                     context.getString(R.string.price_must_be_a_positive_number)
                 )
@@ -200,16 +197,13 @@ internal fun CreateAGoal(
                 val name = result.getString("0") ?: ""
                 val price = result.getString("1") ?: ""
                 if (name.isNotBlank() && price.isNotBlank()) {
-//                    db.createGoal(GoalData(
-//                        name.trim(),
-//                        price.toDoubleOrNull() ?: 0.0,
-//                        (goalsList.maxByOrNull { it.index }?.index ?: 0) + 1
-//                    ))
-                    db.createGoal2(GoalDTO(
-                        name.trim(),
-                        price.toDoubleOrNull() ?: 0.0,
-                        (goalsList.maxByOrNull { it.index }?.index ?: 0) + 1
-                    ))
+                    goalManager.createGoal(
+                        GoalDTO(
+                            name = name.trim(),
+                            price = price.toDoubleOrNull() ?: 0.0,
+                            index = 0 // The index is now calculated in GoalManager
+                        )
+                    )
                 }
             },
         )

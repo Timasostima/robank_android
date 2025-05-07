@@ -59,10 +59,10 @@ import es.timasostima.robank.database.BillData
 import es.timasostima.robank.database.CategoryData
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalData
+import es.timasostima.robank.home.GoalManager
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalStdlibApi::class)
 @Composable
@@ -70,8 +70,9 @@ fun Home(
     navController: NavHostController,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    goalsList: MutableList<GoalData>,
-    categoriesList: MutableList<CategoryData>,
+    goalsList: List<GoalData>,
+    categoriesList: List<CategoryData>,
+    goalManager: GoalManager,
     db: Database,
     currency: String
 ) {
@@ -100,7 +101,7 @@ fun Home(
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
                 val goal =
-                    goalsList.firstOrNull() ?: GoalData(0, stringResource(R.string.example), 0.0, 0) //////////////////////////////////////////////////////////////////////////////////
+                    goalsList.firstOrNull() ?: GoalData(0, stringResource(R.string.example), 0.0, 0)
                 with(sharedTransitionScope) {
                     BasicGoal(
                         goal = goal,
