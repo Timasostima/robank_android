@@ -1,31 +1,26 @@
 package es.timasostima.robank.dto
 
 class CategoryData(
-    var id: Int = 0,
+    var id: Long = 0,
     var name: String,
     var color: String
-) {
-    constructor() : this(0, "", "")
-}
+)
 
 data class GoalData(
     var id: Int = 0,
     var name: String,
     var price: Double,
     var index: Int
-) {
-    constructor() : this(0, "", 0.0, 0)
-}
+)
 
 data class BillData(
+    var id: Long = 0,
     var name: String,
     var amount: Double,
-    var category: CategoryData,
+    var categoryId: Long,
     var date: String,
     var time: String
-) {
-    constructor() : this("", 0.0, CategoryData(), "", "")
-}
+)
 
 data class PreferencesData(
     var id : Int = 0,
@@ -33,6 +28,4 @@ data class PreferencesData(
     var currency: String,
     var theme: String,
     var notifications: Boolean
-) {
-    constructor() : this(0, "", "", "", false)
-}
+)

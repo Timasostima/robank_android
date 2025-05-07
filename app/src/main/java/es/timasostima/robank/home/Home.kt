@@ -55,9 +55,11 @@ import com.maxkeppeler.sheets.color.models.MultipleColors
 import com.maxkeppeler.sheets.color.models.SingleColor
 import es.timasostima.robank.R
 import es.timasostima.robank.config.CategoryPicker
+import es.timasostima.robank.database.BillManager
 import es.timasostima.robank.database.CategoryManager
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalManager
+import es.timasostima.robank.dto.BillDTO
 import es.timasostima.robank.dto.BillData
 import es.timasostima.robank.dto.CategoryDTO
 import es.timasostima.robank.dto.CategoryData
@@ -75,7 +77,7 @@ fun Home(
     goalsList: List<GoalData>,
     categoryManager: CategoryManager,
     categoriesList: List<CategoryData>,
-    db: Database,
+    billManager: BillManager,
     currency: String
 ) {
     val context = LocalContext.current
@@ -176,11 +178,11 @@ fun Home(
                 Button(
                     onClick =
                     {
-                        db.createBill(
-                            BillData(
-                                name = billName.trim(),
+                        billManager.createBill(
+                            BillDTO(
+                                name = billName,
                                 amount = billAmount.toDouble(),
-                                category = pickedCategory,
+                                categoryId = pickedCategory.id,
                                 date = LocalDate.now().format(dateFormatter).toString(),
                                 time = LocalTime.now().format(timeFormatter).toString()
                             )

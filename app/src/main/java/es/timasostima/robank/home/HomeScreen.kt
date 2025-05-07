@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import es.timasostima.robank.database.BillManager
 import es.timasostima.robank.database.CategoryManager
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalManager
@@ -33,7 +34,7 @@ fun HomeScreen(
     categoryManager: CategoryManager,
     goalsList: List<GoalData>,
     goalManager: GoalManager,
-    db: Database,
+    billManager: BillManager,
     currency: String
 ) {
     val curSym = when (currency) {
@@ -56,7 +57,7 @@ fun HomeScreen(
                     goalsList,
                     categoryManager,
                     categoriesList,
-                    db,
+                    billManager,
                     curSym
                 )
             }

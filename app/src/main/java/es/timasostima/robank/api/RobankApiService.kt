@@ -1,5 +1,7 @@
 package es.timasostima.robank.api
 
+import es.timasostima.robank.dto.BillDTO
+import es.timasostima.robank.dto.BillData
 import es.timasostima.robank.dto.CategoryDTO
 import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.dto.GoalDTO
@@ -48,4 +50,10 @@ interface RobankApiService {
 
     @POST("categories")
     suspend fun createCategory(@Body category: CategoryDTO): Response<CategoryData>
+
+    @GET("bills")
+    suspend fun getBills(): Response<List<BillData>>
+
+    @POST("bills")
+    suspend fun createBill(@Body bill: BillDTO): Response<BillData>
 }

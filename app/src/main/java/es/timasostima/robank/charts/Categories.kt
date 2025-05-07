@@ -1,6 +1,7 @@
 package es.timasostima.robank.charts
 
 import android.icu.util.Calendar
+import android.util.Log
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -39,7 +40,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import es.timasostima.robank.R
-import es.timasostima.robank.database.CategoryManager
 import es.timasostima.robank.dto.BillData
 import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.topBorder
@@ -49,9 +49,8 @@ import java.util.Locale
 
 @Composable
 fun Categories(
-    billsList: MutableList<BillData>,
+    billsList: List<BillData>,
     categoriesList: List<CategoryData>,
-    categoryManager: CategoryManager,
     currency: String,
     months: List<String>
 ) {
@@ -62,9 +61,13 @@ fun Categories(
     var chartPIEs by remember {
         mutableStateOf(
             categoriesList.map { category ->
+                Log.i("Category", "Category: ${category.name}")
                 Pie(
                     category.name,
-                    billsList.filter { it.category.name == category.name }.sumOf { it.amount },
+                    billsList.filter { bill ->
+                        Log.i("Category", "Bill: ${bill.categoryId} Category: ${category.id}")
+                        bill.categoryId == category.id
+                    }.sumOf { it.amount },
                     Color(colorString.parseColor(category.color)),
                     selectedScale = 1.1f,
                     selectedPaddingDegree = 0f
@@ -127,7 +130,9 @@ fun Categories(
 
 
         LazyColumn (
-            modifier = Modifier.fillMaxHeight().topBorder(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+            modifier = Modifier
+                .fillMaxHeight()
+                .topBorder(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
         ){
             items(chartPIEs.size) {
 
@@ -142,7 +147,10 @@ fun Categories(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxSize()
-                            .buttomBorder(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                            .buttomBorder(
+                                1.dp,
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            )
                             .padding(start = 10.dp, end = 20.dp)
                     ) {
                         val text = if (chartPIEs[it].label!!.length > 9) {

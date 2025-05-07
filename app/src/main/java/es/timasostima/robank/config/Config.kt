@@ -1,6 +1,7 @@
 package es.timasostima.robank.config
 
 import android.app.LocaleManager
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -411,6 +412,7 @@ fun CategoryPicker(
                 },
                     onClick = {
                         isDropDownExpanded = false
+                        Log.i("CategoryPicker", "Selected category: ${category.id}")
                         onPick(category)
                     }
                 )

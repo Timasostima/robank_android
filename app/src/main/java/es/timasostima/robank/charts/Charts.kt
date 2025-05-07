@@ -35,13 +35,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import es.timasostima.robank.R
+import es.timasostima.robank.database.BillManager
 import es.timasostima.robank.database.CategoryManager
 import es.timasostima.robank.dto.BillData
 import es.timasostima.robank.dto.CategoryData
 
 @Composable
 fun Charts(
-    billsList: MutableList<BillData>,
+    bills: List<BillData>,
+    billManager: BillManager,
     categoriesList: List<CategoryData>,
     categoryManager: CategoryManager,
     currency: String
@@ -77,15 +79,15 @@ fun Charts(
                     ChartPlaceholder(true)
                 }
                 else{
-                    Categories(billsList, categoriesList, categoryManager, curSym, months)
+                    Categories(bills, categoriesList, curSym, months)
                 }
             }
             composable ("bills"){
-                if (billsList.isEmpty()){
+                if (bills.isEmpty()){
                     ChartPlaceholder(false)
                 }
                 else{
-                    Bills(billsList, curSym, months)
+                    Bills(bills, billManager, categoriesList, curSym, months)
                 }
             }
         }

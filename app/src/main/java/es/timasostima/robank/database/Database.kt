@@ -36,48 +36,28 @@ class Database(
                 )
             )
     }
-//    fun loadCategories(categories: MutableList<CategoryData>) {
-//        db.getReference("users/$userId/categories")
-//            .addValueEventListener(object : ValueEventListener {
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    categories.clear()
-//                    val value = snapshot.getValue<Map<String, String>>()
-//                    value?.forEach { (name, color) ->
-//                        categories.add(CategoryData(name, color))
-//                    }
-//                }
+
+//    fun loadBills(bills: MutableList<BillData>) {
 //
-//                override fun onCancelled(error: DatabaseError) {
-//                    Log.w("TAG", "Failed to read value.", error.toException())
-//                }
-//            })
-//    }
+//        db.getReference("users/$userId/bills").addValueEventListener(object : ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                bills.clear()
+//                val value = snapshot.getValue<Map<String, BillData>>()
+//                value?.map { bills.add(it.value) }
 //
-//    fun createCategory(category: CategoryData) {
-//        db.getReference("users/$userId/categories").child(category.name).setValue(category.color)
+//                bills.sortWith(compareBy(
+//                    { LocalDate.parse(it.date, dateFormatter) },
+//                    { LocalTime.parse(it.time, timeFormatter) }
+//                ))
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                Log.w("TAG", "Failed to read value.", error.toException())
+//            }
+//        })
 //    }
 
-    fun loadBills(bills: MutableList<BillData>) {
-
-        db.getReference("users/$userId/bills").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                bills.clear()
-                val value = snapshot.getValue<Map<String, BillData>>()
-                value?.map { bills.add(it.value) }
-
-                bills.sortWith(compareBy(
-                    { LocalDate.parse(it.date, dateFormatter) },
-                    { LocalTime.parse(it.time, timeFormatter) }
-                ))
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("TAG", "Failed to read value.", error.toException())
-            }
-        })
-    }
-
-    fun createBill(bill: BillData) {
-        db.getReference("users/$userId/bills").push().setValue(bill)
-    }
+//    fun createBill(bill: BillData) {
+//        db.getReference("users/$userId/bills").push().setValue(bill)
+//    }
 }

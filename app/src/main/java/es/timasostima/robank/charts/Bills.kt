@@ -37,7 +37,9 @@ import android.graphics.Color as colorString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import es.timasostima.robank.database.BillManager
 import es.timasostima.robank.dto.BillData
+import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.topBorder
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
@@ -52,17 +54,20 @@ import java.util.Locale
 
 @Composable
 fun Bills(
-    billsList: MutableList<BillData>,
+    billsList: List<BillData>,
+    billManager: BillManager,
+    categoriesList: List<CategoryData>,
     currency: String,
     months: List<String>
 ) {
     val chartValue by remember {
         mutableStateOf(
-            billsList.map {
+            billsList.map { bill ->
+                val billCategory = categoriesList.find { it.id == bill.categoryId }
                 Pie(
-                    it.category.name,
-                    it.amount,
-                    Color(colorString.parseColor(it.category.color)),
+                    billCategory?.name ?: "Unknown",
+                    bill.amount,
+                    Color(colorString.parseColor(billCategory?.color ?: "#000000")),
                     selectedScale = 1.1f,
                     selectedPaddingDegree = 0f
                 )
