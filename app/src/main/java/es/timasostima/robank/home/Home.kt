@@ -55,9 +55,11 @@ import com.maxkeppeler.sheets.color.models.MultipleColors
 import com.maxkeppeler.sheets.color.models.SingleColor
 import es.timasostima.robank.R
 import es.timasostima.robank.config.CategoryPicker
+import es.timasostima.robank.database.CategoryManager
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalManager
 import es.timasostima.robank.dto.BillData
+import es.timasostima.robank.dto.CategoryDTO
 import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.dto.GoalData
 import java.time.LocalDate
@@ -71,6 +73,7 @@ fun Home(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     goalsList: List<GoalData>,
+    categoryManager: CategoryManager,
     categoriesList: List<CategoryData>,
     db: Database,
     currency: String
@@ -131,7 +134,7 @@ fun Home(
 
             var pickedCategory by remember {
                 mutableStateOf(
-                    CategoryData(context.getString(R.string.choose_the_category), "")
+                    CategoryData(0, context.getString(R.string.choose_the_category), "")
                 )
             }
             Column(
@@ -185,7 +188,7 @@ fun Home(
                         billName = ""
                         billAmount = ""
                         pickedCategory =
-                            CategoryData(context.getString(R.string.choose_the_category), "")
+                            CategoryData(0, context.getString(R.string.choose_the_category), "")
                     },
                     enabled = canCreate,
                     modifier = Modifier
@@ -229,8 +232,8 @@ fun Home(
 
                 Button(
                     onClick = {
-                        db.createCategory(
-                            CategoryData(
+                        categoryManager.createCategory(
+                            CategoryDTO(
                                 name = categoryName,
                                 color = "#" + selectedColor
                                     .toArgb().toHexString().drop(2).uppercase()

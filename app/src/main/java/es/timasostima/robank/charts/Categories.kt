@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import es.timasostima.robank.R
+import es.timasostima.robank.database.CategoryManager
 import es.timasostima.robank.dto.BillData
 import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.topBorder
@@ -49,7 +50,8 @@ import java.util.Locale
 @Composable
 fun Categories(
     billsList: MutableList<BillData>,
-    categoriesList: MutableList<CategoryData>,
+    categoriesList: List<CategoryData>,
+    categoryManager: CategoryManager,
     currency: String,
     months: List<String>
 ) {

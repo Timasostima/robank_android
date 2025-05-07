@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import es.timasostima.robank.database.CategoryManager
 import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalManager
 import es.timasostima.robank.dto.CategoryData
@@ -29,6 +30,7 @@ import es.timasostima.robank.dto.GoalData
 @Composable
 fun HomeScreen(
     categoriesList: List<CategoryData>,
+    categoryManager: CategoryManager,
     goalsList: List<GoalData>,
     goalManager: GoalManager,
     db: Database,
@@ -52,6 +54,7 @@ fun HomeScreen(
                     this@SharedTransitionLayout,
                     this@composable,
                     goalsList,
+                    categoryManager,
                     categoriesList,
                     db,
                     curSym

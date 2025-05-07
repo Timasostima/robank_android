@@ -1,5 +1,7 @@
 package es.timasostima.robank.api
 
+import es.timasostima.robank.dto.CategoryDTO
+import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.dto.GoalDTO
 import es.timasostima.robank.dto.GoalData
 import es.timasostima.robank.dto.PreferencesData
@@ -39,4 +41,11 @@ interface RobankApiService {
 
     @DELETE("goals/{id}")
     suspend fun deleteGoal(@Path("id") id: Int): Response<Unit>
+
+
+    @GET("categories")
+    suspend fun getCategories(): Response<List<CategoryData>>
+
+    @POST("categories")
+    suspend fun createCategory(@Body category: CategoryDTO): Response<CategoryData>
 }

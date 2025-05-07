@@ -35,13 +35,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import es.timasostima.robank.R
+import es.timasostima.robank.database.CategoryManager
 import es.timasostima.robank.dto.BillData
 import es.timasostima.robank.dto.CategoryData
 
 @Composable
 fun Charts(
     billsList: MutableList<BillData>,
-    categoriesList: MutableList<CategoryData>,
+    categoriesList: List<CategoryData>,
+    categoryManager: CategoryManager,
     currency: String
 ) {
     val controller = rememberNavController()
@@ -75,7 +77,7 @@ fun Charts(
                     ChartPlaceholder(true)
                 }
                 else{
-                    Categories(billsList, categoriesList, curSym, months)
+                    Categories(billsList, categoriesList, categoryManager, curSym, months)
                 }
             }
             composable ("bills"){

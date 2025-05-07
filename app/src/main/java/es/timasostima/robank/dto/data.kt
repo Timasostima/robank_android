@@ -1,10 +1,11 @@
 package es.timasostima.robank.dto
 
 class CategoryData(
+    var id: Int = 0,
     var name: String,
     var color: String
 ) {
-    constructor() : this("", "")
+    constructor() : this(0, "", "")
 }
 
 data class GoalData(

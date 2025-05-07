@@ -36,26 +36,26 @@ class Database(
                 )
             )
     }
-    fun loadCategories(categories: MutableList<CategoryData>) {
-        db.getReference("users/$userId/categories")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    categories.clear()
-                    val value = snapshot.getValue<Map<String, String>>()
-                    value?.forEach { (name, color) ->
-                        categories.add(CategoryData(name, color))
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.w("TAG", "Failed to read value.", error.toException())
-                }
-            })
-    }
-
-    fun createCategory(category: CategoryData) {
-        db.getReference("users/$userId/categories").child(category.name).setValue(category.color)
-    }
+//    fun loadCategories(categories: MutableList<CategoryData>) {
+//        db.getReference("users/$userId/categories")
+//            .addValueEventListener(object : ValueEventListener {
+//                override fun onDataChange(snapshot: DataSnapshot) {
+//                    categories.clear()
+//                    val value = snapshot.getValue<Map<String, String>>()
+//                    value?.forEach { (name, color) ->
+//                        categories.add(CategoryData(name, color))
+//                    }
+//                }
+//
+//                override fun onCancelled(error: DatabaseError) {
+//                    Log.w("TAG", "Failed to read value.", error.toException())
+//                }
+//            })
+//    }
+//
+//    fun createCategory(category: CategoryData) {
+//        db.getReference("users/$userId/categories").child(category.name).setValue(category.color)
+//    }
 
     fun loadBills(bills: MutableList<BillData>) {
 
