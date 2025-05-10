@@ -56,6 +56,7 @@ import com.maxkeppeler.sheets.state.models.StateConfig
 import es.timasostima.robank.R
 import es.timasostima.robank.charts.buttomBorder
 import es.timasostima.robank.database.PreferencesManager
+import es.timasostima.robank.database.ThemeMode
 import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.enterApp.AccountManager
 import es.timasostima.robank.enterApp.PasswordReset

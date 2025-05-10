@@ -57,16 +57,14 @@ import es.timasostima.robank.R
 import es.timasostima.robank.config.CategoryPicker
 import es.timasostima.robank.database.BillManager
 import es.timasostima.robank.database.CategoryManager
-import es.timasostima.robank.database.Database
-import es.timasostima.robank.database.GoalManager
 import es.timasostima.robank.dto.BillDTO
-import es.timasostima.robank.dto.BillData
 import es.timasostima.robank.dto.CategoryDTO
 import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.dto.GoalData
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalStdlibApi::class)
 @Composable
@@ -203,8 +201,19 @@ fun Home(
         }
 
         item {
+            val templateColors = MultipleColors.ColorsInt(
+                Color(0xFFB79AE8).toArgb(),
+                Color(0xFF7ED7C1).toArgb(),
+                Color(0xFFFFAEBA).toArgb(),
+                Color(0xFFC3E88D).toArgb(),
+                Color(0xFFFFD787).toArgb(),
+                Color(0xFF82AAFF).toArgb(),
+                Color(0xFFF07178).toArgb(),
+                Color(0xFFBBBBD4).toArgb(),
+            )
+
             var categoryName by remember { mutableStateOf("") }
-            var selectedColor by remember { mutableStateOf(Color.Red) }
+            var selectedColor by remember { mutableStateOf(Color(0xFFB79AE8)) }
 
             Column(
                 modifier = Modifier
@@ -228,7 +237,7 @@ fun Home(
                         .padding(10.dp)
                 )
 
-                ColorPicker(selectedColor) {
+                ColorPicker(selectedColor, templateColors) {
                     selectedColor = it
                 }
 
@@ -289,6 +298,7 @@ fun Home(
 @Composable
 fun ColorPicker(
     value: Color,
+    templateColors: MultipleColors.ColorsInt,
     onChangeValue: (Color) -> Unit
 ) {
     var open by remember { mutableStateOf(false) }
@@ -322,17 +332,6 @@ fun ColorPicker(
     )
 
     if (open) {
-        val templateColors = MultipleColors.ColorsInt(
-            Color(0xFFE57373).toArgb(),
-            Color(0xFF64B5F6).toArgb(),
-            Color(0xFF81C784).toArgb(),
-            Color(0xFFFFB74D).toArgb(),
-            Color(0xFFBA68C8).toArgb(),
-            Color(0xFF4DB6AC).toArgb(),
-            Color(0xFFFF8A65).toArgb(),
-            Color(0xFFA1887F).toArgb(),
-        )
-
         ColorDialog(
             state = rememberUseCaseState(visible = true, onCloseRequest = { open = false }),
 
@@ -355,7 +354,7 @@ fun Context.sendMail(
 ) {
     try {
         val intent = Intent(Intent.ACTION_VIEW)
-        val data = Uri.parse("mailto:?subject=$subject&to=$to")
+        val data = "mailto:?subject=$subject&to=$to".toUri()
         intent.setData(data)
         startActivity(intent)
     } catch (_: ActivityNotFoundException) {

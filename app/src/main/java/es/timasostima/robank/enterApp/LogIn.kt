@@ -110,12 +110,12 @@ fun LogIn(
             .background(MaterialTheme.colorScheme.background)
     ){
         var targetTimeEnvelope: Long by remember { mutableLongStateOf(0L) }
-        LaunchedEffect (key1 = true){
-            while (true){
-                delay(5000)
-                targetTimeEnvelope = System.currentTimeMillis() + 1600
-            }
-        }
+//        LaunchedEffect (key1 = true){
+//            while (true){
+//                delay(5000)
+//                targetTimeEnvelope = System.currentTimeMillis() + 1600
+//            }
+//        }
         Countdown(targetTimeEnvelope) { remainingTime ->
             if (remainingTime > 0) {
                 AnimatedLogo(
@@ -127,7 +127,7 @@ fun LogIn(
             }
             else {
                 Image(
-                    painter = painterResource(R.drawable.logo),
+                    painter = painterResource(R.drawable.robank_logo),
                     contentDescription = "app logo",
                     modifier = Modifier
                         .fillMaxWidth()

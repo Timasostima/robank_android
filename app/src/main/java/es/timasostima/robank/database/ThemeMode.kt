@@ -1,4 +1,4 @@
-package es.timasostima.robank.config
+package es.timasostima.robank.database
 
 enum class ThemeMode(val value: String) {
     SYSTEM("system"),

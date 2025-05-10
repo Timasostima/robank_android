@@ -93,7 +93,7 @@ fun SignUp(
         ) {
             Spacer(modifier = Modifier.size(17.dp))
             Image(
-                painter = painterResource(R.drawable.logo),
+                painter = painterResource(R.drawable.robank_logo),
                 contentDescription = "",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -203,7 +203,7 @@ fun SignUp(
                 )
                 Text(
                     stringResource(R.string.i_accept_the),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 14.sp
                 )
                 Text(

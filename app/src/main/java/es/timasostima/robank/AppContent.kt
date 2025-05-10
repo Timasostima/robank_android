@@ -35,7 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import es.timasostima.robank.charts.Charts
 import es.timasostima.robank.config.ConfigScreen
 import es.timasostima.robank.database.PreferencesManager
-import es.timasostima.robank.config.ThemeMode
+import es.timasostima.robank.database.ThemeMode
 import es.timasostima.robank.database.BillManager
 import es.timasostima.robank.database.CategoryManager
 import es.timasostima.robank.database.Database

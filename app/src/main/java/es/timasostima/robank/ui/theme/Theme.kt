@@ -12,43 +12,66 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+//private val DarkColorScheme = darkColorScheme(
+//    primary = Green,
+//    background = DarkBlue,
+//
+//    onSurface = White,
+//    onSecondaryContainer = White.copy(alpha = 0.45f),
+//
+//    //textfields, configs, home sections, charts topBar and lists
+//    surface = DarkerBlue,
+//
+////    surfaceContainer = LightBlue,
+//
+//    //navbar selection
+//    secondaryContainer = White.copy(alpha = 0.15f),
+//)
+//
+//private val LightColorScheme = lightColorScheme(
+//    primary = Green,
+//    background = White,
+//
+//    onSurface = Black,
+//    onSecondaryContainer = DarkBlue.copy(alpha = 0.45f),
+//
+//    surface = Whiter,
+//
+////    surfaceContainer = Gray,
+//
+//    secondaryContainer = DarkBlue.copy(alpha = 0.10f),
+//
+////    background = Color(0xFFFFFBFE),
+////    surface = Color(0xFFFFFBFE),
+////    onPrimary = Color.White,
+////    onSecondary = Color.White,
+////    onTertiary = Color.White,
+////    onBackground = Color(0xFF1C1B1F),
+////    onSurface = Color(0xFF1C1B1F),
+//
+//)
+
 private val DarkColorScheme = darkColorScheme(
-    primary = Green,
-    background = DarkBlue,
+    primary = DarkPrimary,
+    background = DarkBackground,
 
-    onSurface = White,
-    onSecondaryContainer = White.copy(alpha = 0.45f),
+    // textfields, configs, home sections, charts topBar and lists
+    onSurface = DarkOnSurface,
+    surface = DarkSurface,
 
-    //textfields, configs, home sections, charts topBar and lists
-    surface = DarkerBlue,
-
-//    surfaceContainer = LightBlue,
-
-    //navbar selection
-    secondaryContainer = White.copy(alpha = 0.15f),
+    onSecondaryContainer = DarkOnSecondaryContainer,
+    secondaryContainer = DarkSecondaryContainer,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Green,
-    background = White,
+    primary = LightPrimary,
+    background = LightBackground,
 
-    onSurface = Black,
-    onSecondaryContainer = DarkBlue.copy(alpha = 0.45f),
+    onSurface = LightOnSurface,
+    surface = LightSurface,
 
-    surface = Whiter,
-
-//    surfaceContainer = Gray,
-
-    secondaryContainer = DarkBlue.copy(alpha = 0.10f),
-
-//    background = Color(0xFFFFFBFE),
-//    surface = Color(0xFFFFFBFE),
-//    onPrimary = Color.White,
-//    onSecondary = Color.White,
-//    onTertiary = Color.White,
-//    onBackground = Color(0xFF1C1B1F),
-//    onSurface = Color(0xFF1C1B1F),
-
+    onSecondaryContainer = LightOnSecondaryContainer.copy(alpha = 0.45f),
+    secondaryContainer = LightSecondaryContainer.copy(alpha = 0.5f),
 )
 
 @Composable

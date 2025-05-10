@@ -2,7 +2,7 @@ package es.timasostima.robank.database
 
 import android.util.Log
 import es.timasostima.robank.api.RetrofitClient
-import es.timasostima.robank.config.ThemeMode
+import es.timasostima.robank.database.ThemeMode
 import es.timasostima.robank.dto.PreferencesData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
