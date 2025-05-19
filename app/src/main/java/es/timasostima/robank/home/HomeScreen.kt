@@ -22,7 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import es.timasostima.robank.database.BillManager
 import es.timasostima.robank.database.CategoryManager
-import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.GoalManager
 import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.dto.GoalData

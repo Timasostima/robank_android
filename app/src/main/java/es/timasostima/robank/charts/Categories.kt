@@ -46,6 +46,7 @@ import es.timasostima.robank.topBorder
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 import java.util.Locale
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun Categories(
@@ -68,7 +69,7 @@ fun Categories(
                         Log.i("Category", "Bill: ${bill.categoryId} Category: ${category.id}")
                         bill.categoryId == category.id
                     }.sumOf { it.amount },
-                    Color(colorString.parseColor(category.color)),
+                    Color(category.color.toColorInt()),
                     selectedScale = 1.1f,
                     selectedPaddingDegree = 0f
                 )

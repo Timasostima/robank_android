@@ -20,16 +20,13 @@ import com.google.firebase.ktx.Firebase
 import es.timasostima.robank.BuildConfig
 import es.timasostima.robank.api.RetrofitClient
 import es.timasostima.robank.api.RobankUser
-import es.timasostima.robank.database.Database
 import es.timasostima.robank.database.LogInResult
 import es.timasostima.robank.database.SignUpResult
 import kotlinx.coroutines.tasks.await
 import java.security.MessageDigest
 import java.util.UUID
 
-class AccountManager (
-    private val activity: Activity
-)
+class AccountManager (private val activity: Activity)
 {
     private val credentialManager = CredentialManager.create(activity)
     private val auth: FirebaseAuth = Firebase.auth
@@ -57,7 +54,6 @@ class AccountManager (
             auth.createUserWithEmailAndPassword(username, password).await()
             auth.currentUser?.sendEmailVerification()?.await()
 
-            Database(auth.currentUser!!.uid).createUserData()
             try {
                 val backendUser = RobankUser(
                     uid = auth.currentUser!!.uid,
@@ -150,9 +146,6 @@ class AccountManager (
                     GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
 
                 val a = auth.signInWithCredential(authCredential).await()
-                if (a.additionalUserInfo?.isNewUser == true){
-                    Database(auth.currentUser!!.uid).createUserData()
-                }
             }
             else{
                 println("Error")

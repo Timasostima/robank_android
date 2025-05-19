@@ -51,11 +51,11 @@ import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Pie
 import java.time.LocalDate
 import java.util.Locale
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun Bills(
     billsList: List<BillData>,
-    billManager: BillManager,
     categoriesList: List<CategoryData>,
     currency: String,
     months: List<String>
@@ -67,7 +67,7 @@ fun Bills(
                 Pie(
                     billCategory?.name ?: "Unknown",
                     bill.amount,
-                    Color(colorString.parseColor(billCategory?.color ?: "#000000")),
+                    Color((billCategory?.color ?: "#000000").toColorInt()),
                     selectedScale = 1.1f,
                     selectedPaddingDegree = 0f
                 )

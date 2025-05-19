@@ -43,9 +43,7 @@ import es.timasostima.robank.dto.CategoryData
 @Composable
 fun Charts(
     bills: List<BillData>,
-    billManager: BillManager,
     categoriesList: List<CategoryData>,
-    categoryManager: CategoryManager,
     currency: String
 ) {
     val controller = rememberNavController()
@@ -87,7 +85,7 @@ fun Charts(
                     ChartPlaceholder(false)
                 }
                 else{
-                    Bills(bills, billManager, categoriesList, curSym, months)
+                    Bills(bills, categoriesList, curSym, months)
                 }
             }
         }

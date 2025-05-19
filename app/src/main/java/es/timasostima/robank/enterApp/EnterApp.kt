@@ -34,7 +34,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import es.timasostima.robank.App
 import es.timasostima.robank.R
-import es.timasostima.robank.database.Database
 
 @Composable
 fun EnterApp(
@@ -73,9 +72,7 @@ fun EnterApp(
             TermsConditions(navController, termsDecision)
         }
         composable("app/{userID}"){
-            val userId = it.arguments?.getString("userID") ?: "Error"
-            val db = Database(userId)
-            App(changeMode, db, accountManager, navController)
+            App(changeMode, accountManager, navController)
         }
     }
 }

@@ -38,18 +38,14 @@ import es.timasostima.robank.database.PreferencesManager
 import es.timasostima.robank.database.ThemeMode
 import es.timasostima.robank.database.BillManager
 import es.timasostima.robank.database.CategoryManager
-import es.timasostima.robank.database.Database
 import es.timasostima.robank.enterApp.AccountManager
 import es.timasostima.robank.database.GoalManager
-import es.timasostima.robank.dto.BillData
-import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.home.HomeScreen
 import es.timasostima.robank.ui.theme.RobankTheme
 
 @Composable
 fun App(
     changeMode: (Boolean?) -> Unit,
-    db: Database,
     accountManager: AccountManager,
     loginNav: NavHostController
 ) {
@@ -93,7 +89,7 @@ fun App(
                 ConfigScreen(changeMode, loginNav, accountManager, preferencesManager)
             }
             composable("charts") {
-                Charts(bills, billManager, categories, categoriesManager, preferences?.currency ?: "eur")
+                Charts(bills, categories, preferences?.currency ?: "eur")
             }
         }
     }
