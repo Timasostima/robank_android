@@ -81,4 +81,6 @@
     <string name="november">Noviembre</string>
     <string name="december">Diciembre</string>
     <string name="notifications">Notificaciones</string>
+    <string name="name_must_be_longer_than">"El nombre debe tener mas de "</string>
+    <string name="name_must_be_shorter_than">"El nombre debe tener menos de "</string>
 </resources>

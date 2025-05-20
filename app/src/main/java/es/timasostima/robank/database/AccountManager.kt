@@ -16,6 +16,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import es.timasostima.robank.BuildConfig
@@ -40,7 +41,8 @@ class AccountManager(private val activity: Activity) {
 
     suspend fun signUp(
         username: String,
-        password: String
+        password: String,
+        name: String
     ): SignUpResult {
         return try {
             try {
@@ -58,13 +60,20 @@ class AccountManager(private val activity: Activity) {
             }
 
             auth.createUserWithEmailAndPassword(username, password).await()
+
+            // Update Firebase user profile with the name
+            val profileUpdates = UserProfileChangeRequest.Builder()
+                .setDisplayName(name)
+                .build()
+            auth.currentUser?.updateProfile(profileUpdates)?.await()
+
             auth.currentUser?.sendEmailVerification()?.await()
 
             try {
                 val backendUser = RobankUser(
                     uid = auth.currentUser!!.uid,
                     email = username,
-                    name = username.substringBefore('@')
+                    name = name
                 )
                 val response = RetrofitClient.apiService.registerUser(backendUser)
                 if (!response.isSuccessful) {

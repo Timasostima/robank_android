@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,20 +38,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
-import com.maxkeppeker.sheets.core.icons.LibIcons
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.state.StateDialog
-import com.maxkeppeler.sheets.state.StatePopup
 import com.maxkeppeler.sheets.state.models.ProgressIndicator
 import com.maxkeppeler.sheets.state.models.State
 import com.maxkeppeler.sheets.state.models.StateConfig
-import com.maxkeppeler.sheets.state.models.StateSelection
 import es.timasostima.robank.R
 import es.timasostima.robank.database.SignUpResult
 import kotlinx.coroutines.CoroutineScope
@@ -69,18 +62,24 @@ fun SignUp(
     agreesToTerms: Boolean,
     termsDecision: (Boolean) -> Unit
 ) {
+    val minLengthPassword = 6
+    val maxLengthPassword = 20
+    val minLengthName = 3
+    val maxLengthName = 15
+
     var email by remember { mutableStateOf("") }
     val emailPattern = Patterns.EMAIL_ADDRESS
     val validEmail = emailPattern.matcher(email).matches()
+
     var password by remember { mutableStateOf("") }
+    val validPassword = password.length in minLengthPassword..maxLengthPassword
+
+    var name by remember { mutableStateOf("") }
+    val validName = name.length in minLengthName..maxLengthName
 
     var showVerificationDialog by remember { mutableStateOf(false) }
     var showAlreadyExistsDialog by remember { mutableStateOf(false) }
     var showFailureDialog by remember { mutableStateOf(false) }
-
-    val minLength = 6
-    val maxLength = 15
-    val validPassword = password.length in minLength..maxLength
 
     Box {
         Column(
@@ -113,22 +112,6 @@ fun SignUp(
                         .padding(10.dp)
                 )
                 if (showEmailInfo) {
-//                    StatePopup(
-//                        state = rememberUseCaseState(
-//                            visible = true,
-//                            onCloseRequest = { showEmailInfo = false }
-//                        ),
-//                        config = StateConfig(
-//                            state = State.Failure(
-//                                labelText = "lasaa"
-//                            ),
-//                        ),
-//                        properties = PopupProperties(
-//                            dismissOnBackPress = true,
-//                            dismissOnClickOutside = true
-//                        ),
-//                        alignment = Alignment.TopEnd,
-//                    )
                     StateDialog(
                         state = rememberUseCaseState(
                             visible = true,
@@ -147,7 +130,7 @@ fun SignUp(
                 }
             }
             RobankTextField(
-                password, stringResource(R.string.password),
+                password, stringResource(R.string.password).lowercase(),
                 { password = it }, validPassword,
                 transformation = PasswordVisualTransformation()
             )
@@ -170,11 +153,44 @@ fun SignUp(
                         ),
                         config = StateConfig(
                             state =
-                            if (password.length < minLength) {
-                                State.Failure(labelText = stringResource(R.string.password_must_be_longer_than) + minLength)
-                            } else {
-                                State.Failure(labelText = stringResource(R.string.password_must_be_shorter_than) + maxLength)
-                            }
+                                if (password.length < minLengthPassword) {
+                                    State.Failure(labelText = stringResource(R.string.password_must_be_longer_than) + minLengthPassword)
+                                } else {
+                                    State.Failure(labelText = stringResource(R.string.password_must_be_shorter_than) + maxLengthPassword)
+                                }
+                        ),
+                        properties = DialogProperties(
+                            dismissOnBackPress = true,
+                            dismissOnClickOutside = true
+                        )
+                    )
+                }
+            }
+
+            RobankTextField(name, stringResource(R.string.name), { name = it }, validName) {
+                var showNameInfo by remember { mutableStateOf(false) }
+                TraIcon(
+                    validName,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(27.dp))
+                        .clickable {
+                            showNameInfo = !showNameInfo
+                        }
+                        .padding(10.dp)
+                )
+                if (showNameInfo) {
+                    StateDialog(
+                        state = rememberUseCaseState(
+                            visible = true,
+                            onCloseRequest = { showNameInfo = false }
+                        ),
+                        config = StateConfig(
+                            state =
+                                if (name.length < minLengthName) {
+                                    State.Failure(labelText = stringResource(R.string.name_must_be_longer_than) + minLengthName)
+                                } else {
+                                    State.Failure(labelText = stringResource(R.string.name_must_be_shorter_than) + maxLengthName)
+                                }
                         ),
                         properties = DialogProperties(
                             dismissOnBackPress = true,
@@ -221,7 +237,7 @@ fun SignUp(
             Button(
                 onClick = {
                     scope.launch {
-                        val result = accountManager.signUp(email, password)
+                        val result = accountManager.signUp(email, password, name)
 
                         if (result is SignUpResult.Success) {
                             showVerificationDialog = true
@@ -234,7 +250,7 @@ fun SignUp(
                         }
                     }
                 },
-                enabled = validEmail && validPassword && agreesToTerms,
+                enabled = validEmail && validPassword && agreesToTerms && validName,
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
             ) {
@@ -273,14 +289,14 @@ fun SignUp(
                 ),
                 config = StateConfig(
                     state =
-                    if (inProgress) {
-                        State.Loading(
-                            labelText = stringResource(R.string.sending),
-                            ProgressIndicator.Circular()
-                        )
-                    } else {
-                        State.Success(labelText = stringResource(R.string.the_email_has_been_sent))
-                    }
+                        if (inProgress) {
+                            State.Loading(
+                                labelText = stringResource(R.string.sending),
+                                ProgressIndicator.Circular()
+                            )
+                        } else {
+                            State.Success(labelText = stringResource(R.string.the_email_has_been_sent))
+                        }
                 ),
                 properties = DialogProperties(
                     dismissOnBackPress = true,
