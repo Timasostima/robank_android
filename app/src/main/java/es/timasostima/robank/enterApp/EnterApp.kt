@@ -66,7 +66,7 @@ fun EnterApp(
             LogIn(navController, accountManager, scope, showCredentials, changeCredVis)
         }
         composable("signUp"){
-            SignUp(navController, accountManager, scope, agreesToTerms, termsDecision)
+            Register(navController, accountManager, scope, agreesToTerms, termsDecision)
         }
         composable("terms"){
             TermsConditions(navController, termsDecision)

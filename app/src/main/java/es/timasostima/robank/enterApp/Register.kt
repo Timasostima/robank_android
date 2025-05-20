@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUp(
+fun Register(
     navController: NavHostController,
     accountManager: AccountManager,
     scope: CoroutineScope,
