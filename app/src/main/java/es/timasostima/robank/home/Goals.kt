@@ -7,6 +7,7 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,13 +18,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,17 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
-import com.maxkeppeler.sheets.input.InputDialog
-import com.maxkeppeler.sheets.input.models.InputHeader
-import com.maxkeppeler.sheets.input.models.InputSelection
-import com.maxkeppeler.sheets.input.models.InputTextField
-import com.maxkeppeler.sheets.input.models.InputTextFieldType
-import com.maxkeppeler.sheets.input.models.ValidationResult
 import es.timasostima.robank.R
 import es.timasostima.robank.database.GoalManager
 import es.timasostima.robank.dto.GoalDTO
@@ -147,65 +145,145 @@ fun Goals(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CreateAGoal(
+fun CreateAGoal(
     closeSelection: () -> Unit,
     goalManager: GoalManager,
     context: Context
 ) {
-    val inputOptions = listOf(
-        InputTextField(
-            type = InputTextFieldType.OUTLINED,
-            header = InputHeader(
-                title = stringResource(R.string.goal_name),
-            ),
-            validationListener = { value ->
-                if ((value?.trim()?.length ?: 0) < 3) ValidationResult.Invalid(context.getString(R.string.name_needs_to_be_at_least_3_letters_long))
-                else ValidationResult.Valid
-            },
-            singleLine = true,
-            required = true
-        ),
-        InputTextField(
-            type = InputTextFieldType.OUTLINED,
-            header = InputHeader(
-                title = stringResource(R.string.goal_price),
-            ),
-            validationListener = { value ->
-                if (value.isNullOrBlank()) ValidationResult.Invalid(context.getString(R.string.price_is_required))
-                else if (value.toDoubleOrNull() == null) ValidationResult.Invalid(
-                    context.getString(
-                        R.string.price_must_be_a_number
-                    )
-                )
-                else if (value.toDouble() <= 0) ValidationResult.Invalid(
-                    context.getString(R.string.price_must_be_a_positive_number)
-                )
-                else ValidationResult.Valid
-            },
-            singleLine = true,
-            required = true
-        )
-    )
+    var goalName by remember { mutableStateOf("") }
+    var goalPrice by remember { mutableStateOf("") }
 
-    InputDialog(
-        state = rememberUseCaseState(visible = true, onCloseRequest = { closeSelection() }),
-        selection = InputSelection(
-            input = inputOptions,
-            onPositiveClick = { result ->
-                val name = result.getString("0") ?: ""
-                val price = result.getString("1") ?: ""
-                if (name.isNotBlank() && price.isNotBlank()) {
-                    goalManager.createGoal(
-                        GoalDTO(
-                            name = name.trim(),
-                            price = price.toDoubleOrNull() ?: 0.0,
-                            index = 0 // The index is now calculated in GoalManager
-                        )
+    var nameError by remember { mutableStateOf<String?>(null) }
+    var priceError by remember { mutableStateOf<String?>(null) }
+
+    fun validateName(name: String): Boolean {
+        return if (name.trim().length < 3) {
+            nameError = context.getString(R.string.name_needs_to_be_at_least_3_letters_long)
+            false
+        } else {
+            nameError = null
+            true
+        }
+    }
+
+    fun validatePrice(price: String): Boolean {
+        return when {
+            price.isBlank() -> {
+                priceError = context.getString(R.string.price_is_required)
+                false
+            }
+            price.toDoubleOrNull() == null -> {
+                priceError = context.getString(R.string.price_must_be_a_number)
+                false
+            }
+            price.toDouble() <= 0 -> {
+                priceError = context.getString(R.string.price_must_be_a_positive_number)
+                false
+            }
+            else -> {
+                priceError = null
+                true
+            }
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = closeSelection,
+        title = {
+            Text(
+                text = stringResource(R.string.add),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Name field
+                Column {
+                    Text(
+                        text = stringResource(R.string.goal_name),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
+                    OutlinedTextField(
+                        value = goalName,
+                        onValueChange = {
+                            goalName = it
+                            validateName(it)
+                        },
+                        isError = nameError != null,
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    nameError?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 4.dp)
+                        )
+                    }
                 }
-            },
-        )
+
+                // Price field
+                Column {
+                    Text(
+                        text = stringResource(R.string.goal_price),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    OutlinedTextField(
+                        value = goalPrice,
+                        onValueChange = {
+                            goalPrice = it
+                            validatePrice(it)
+                        },
+                        isError = priceError != null,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    priceError?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 4.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val isNameValid = validateName(goalName)
+                    val isPriceValid = validatePrice(goalPrice)
+
+                    if (isNameValid && isPriceValid) {
+                        goalManager.createGoal(
+                            GoalDTO(
+                                name = goalName.trim(),
+                                price = goalPrice.toDoubleOrNull() ?: 0.0,
+                                index = 0 // The index is now calculated in GoalManager
+                            )
+                        )
+                        closeSelection()
+                    }
+                }
+            ) {
+                Text(stringResource(R.string.add))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = closeSelection) {
+                Text(stringResource(R.string.i_reject))
+            }
+        }
     )
 }

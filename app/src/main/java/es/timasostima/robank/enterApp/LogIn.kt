@@ -74,7 +74,7 @@ fun LogIn(
     scope: CoroutineScope,
     showCredentials: Boolean,
     changeCredVis: () -> Unit
-){
+) {
     val context = LocalContext.current
     var showPassword by remember { mutableStateOf(false) }
 
@@ -82,10 +82,8 @@ fun LogIn(
     var showCredentialsFailureDialog by remember { mutableStateOf(false) }
     var showPasswordResetDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = true){
-        println("almost")
-        if (showCredentials){
-            println("In CM")
+    LaunchedEffect(key1 = true) {
+        if (showCredentials) {
             changeCredVis()
             delay(1000)
             val result = accountManager.logInCredentialManager()
@@ -95,54 +93,34 @@ fun LogIn(
                         inclusive = true
                     }
                 }
-            }
-            else if (result is LogInResult.EmailNotVerified) {
+            } else if (result is LogInResult.EmailNotVerified) {
                 showEmailDialog = true
             }
         }
     }
 
-    Column (
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround,
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-    ){
-        var targetTimeEnvelope: Long by remember { mutableLongStateOf(0L) }
-//        LaunchedEffect (key1 = true){
-//            while (true){
-//                delay(5000)
-//                targetTimeEnvelope = System.currentTimeMillis() + 1600
-//            }
-//        }
-        Countdown(targetTimeEnvelope) { remainingTime ->
-            if (remainingTime > 0) {
-                AnimatedLogo(
-                    gifDrawable = R.drawable.logo_animated,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.3f)
-                )
-            }
-            else {
-                Image(
-                    painter = painterResource(R.drawable.robank_logo),
-                    contentDescription = "app logo",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.3f)
-                )
-            }
-        }
+    ) {
+        Image(
+            painter = painterResource(R.drawable.robank_logo),
+            contentDescription = "app logo",
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.3f)
+        )
 
-        Column (
+        Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth(0.8f)
                 .fillMaxHeight(0.6f)
-        ){
+        ) {
             var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
 
@@ -158,7 +136,7 @@ fun LogIn(
                 transformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
             )
             {
-                if (showPassword){
+                if (showPassword) {
                     Icon(
                         painter = painterResource(R.drawable.visibility_on),
                         contentDescription = "invalid",
@@ -170,8 +148,7 @@ fun LogIn(
                             }
                             .padding(10.dp)
                     )
-                }
-                else{
+                } else {
                     Icon(
                         painter = painterResource(R.drawable.visibility_off),
                         contentDescription = "invalid",
@@ -201,10 +178,10 @@ fun LogIn(
             )
             Spacer(modifier = Modifier.size(10.dp))
 
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
-            ){
+            ) {
                 Button(
                     onClick = {
                         scope.launch {
@@ -216,11 +193,9 @@ fun LogIn(
                                         inclusive = true
                                     }
                                 }
-                            }
-                            else if (result is LogInResult.EmailNotVerified) {
+                            } else if (result is LogInResult.EmailNotVerified) {
                                 showEmailDialog = true
-                            }
-                            else if (result is LogInResult.Failure) {
+                            } else if (result is LogInResult.Failure) {
                                 showCredentialsFailureDialog = true
                             }
                         }
@@ -272,10 +247,10 @@ fun LogIn(
 //                }
             }
 
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
-            ){
+            ) {
                 Text(
                     stringResource(R.string.don_t_have_an_account_yet),
                     color = MaterialTheme.colorScheme.onSurface,
@@ -293,7 +268,7 @@ fun LogIn(
                 )
             }
 
-            if (showEmailDialog){
+            if (showEmailDialog) {
                 StateDialog(
                     state = rememberUseCaseState(
                         visible = true,
@@ -308,7 +283,7 @@ fun LogIn(
                     )
                 )
             }
-            if (showCredentialsFailureDialog){
+            if (showCredentialsFailureDialog) {
                 StateDialog(
                     state = rememberUseCaseState(
                         visible = true,
@@ -324,10 +299,14 @@ fun LogIn(
                 )
             }
             var showPasswordResetConfirmation by remember { mutableStateOf(false) }
-            if (showPasswordResetDialog){
-                PasswordReset(context, scope, accountManager, {showPasswordResetConfirmation = true}) { showPasswordResetDialog = false }
+            if (showPasswordResetDialog) {
+                PasswordReset(
+                    context,
+                    scope,
+                    accountManager,
+                    { showPasswordResetConfirmation = true }) { showPasswordResetDialog = false }
             }
-            if (showPasswordResetConfirmation){
+            if (showPasswordResetConfirmation) {
                 StateDialog(
                     state = rememberUseCaseState(
                         visible = true,
@@ -354,7 +333,7 @@ fun PasswordReset(
     scope: CoroutineScope,
     accountManager: AccountManager,
     confirmDialog: () -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
 ) {
     val emailPattern = Patterns.EMAIL_ADDRESS
     val inputOptions = listOf(
@@ -362,19 +341,19 @@ fun PasswordReset(
             type = InputTextFieldType.OUTLINED,
             header = InputHeader(
                 title = stringResource(R.string.password_reset),
+                body = stringResource(R.string.password_reset_body)
             ),
             validationListener = { value ->
-                println(value)
+                println("the value in goal is " + value)
                 if (value.isNullOrBlank()) ValidationResult.Invalid(context.getString(R.string.email_is_required))
-                else if (!emailPattern.matcher(value).matches()){
+                else if (!emailPattern.matcher(value).matches()) {
                     ValidationResult.Invalid(context.getString(R.string.invalid_email_address))
-                }
-                else ValidationResult.Valid
+                } else ValidationResult.Valid
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             required = true
-        )
+        ),
     )
     InputDialog(
         state = rememberUseCaseState(
@@ -396,42 +375,4 @@ fun PasswordReset(
             },
         )
     )
-}
-
-@Composable
-fun AnimatedLogo(
-    gifDrawable: Int,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            add(ImageDecoderDecoder.Factory())
-        }
-        .build()
-    Image(
-        painter = rememberAsyncImagePainter(
-            ImageRequest
-                .Builder(context)
-                .data(data = gifDrawable)
-                .build(),
-            imageLoader = imageLoader
-        ),
-        contentDescription = null,
-        modifier = modifier.padding(top=2.dp, start = 2.dp),
-    )
-}
-
-@Composable
-fun Countdown(targetTime: Long, content: @Composable (remainingTime: Long) -> Unit) {
-    var remainingTime by remember(targetTime) {
-        mutableLongStateOf(targetTime - System.currentTimeMillis())
-    }
-
-    content.invoke(remainingTime)
-
-    LaunchedEffect(remainingTime) {
-        delay(100L)
-        remainingTime = targetTime - System.currentTimeMillis()
-    }
 }

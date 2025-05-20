@@ -83,4 +83,5 @@
     <string name="notifications">Notificaciones</string>
     <string name="name_must_be_longer_than">"El nombre debe tener mas de "</string>
     <string name="name_must_be_shorter_than">"El nombre debe tener menos de "</string>
+    <string name="password_reset_body">Introduce tu email</string>
 </resources>
