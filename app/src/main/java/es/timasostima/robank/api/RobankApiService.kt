@@ -7,6 +7,8 @@ import es.timasostima.robank.dto.CategoryData
 import es.timasostima.robank.dto.GoalDTO
 import es.timasostima.robank.dto.GoalData
 import es.timasostima.robank.dto.PreferencesData
+import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -56,4 +58,15 @@ interface RobankApiService {
 
     @POST("bills")
     suspend fun createBill(@Body bill: BillDTO): Response<BillData>
+
+    @GET("user/pfp")
+    @Streaming
+    suspend fun getUserProfileImage(): ResponseBody
+
+    @Multipart
+    @POST("user/upload-pfp")
+    suspend fun uploadProfileImage(@Part file: MultipartBody.Part): Response<Map<String, String>>
+
+    @POST("user/upload-pfp-firebase")
+    suspend fun uploadProfileImageFromUrl(@Body requestBody: Map<String, String>): Response<Map<String, String>>
 }

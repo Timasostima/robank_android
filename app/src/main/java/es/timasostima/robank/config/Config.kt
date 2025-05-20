@@ -1,7 +1,11 @@
 package es.timasostima.robank.config
 
 import android.app.LocaleManager
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,13 +18,18 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +51,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,6 +60,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.google.firebase.auth.FirebaseUser
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.state.StateDialog
 import com.maxkeppeler.sheets.state.models.State
@@ -64,6 +78,7 @@ import es.timasostima.robank.notifications.RequestNotificationPermission
 import es.timasostima.robank.notifications.checkNotificationPermission
 import es.timasostima.robank.notifications.createNotificationChannel
 import es.timasostima.robank.notifications.showNotification
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +92,8 @@ fun ConfigScreen(
     val scope = rememberCoroutineScope()
     var showPasswordResetDialog by remember { mutableStateOf(false) }
 
+    val user: FirebaseUser = accountManager.getCurrentUser()!!
+
     val theme by preferencesManager.themeState.collectAsState()
     val preferences by preferencesManager.preferencesState.collectAsState()
 
@@ -84,12 +101,13 @@ fun ConfigScreen(
         changeMode(ThemeMode.toBooleanForDarkMode(theme))
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
-        .padding(top = 30.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(top = 30.dp)
     ) {
-        UserRow(loginNav)
+        UserRow(loginNav, user, accountManager)
 
         Spacer(Modifier.height(20.dp))
 
@@ -243,7 +261,11 @@ fun ConfigScreen(
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
-            Text(stringResource(R.string.coming_soon), fontSize = 40.sp, modifier = Modifier.align(Alignment.Center))
+            Text(
+                stringResource(R.string.coming_soon),
+                fontSize = 40.sp,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
     }
 
@@ -279,42 +301,143 @@ fun ConfigScreen(
 @Composable
 fun UserRow(
     loginNav: NavHostController,
-){
-    val name = "Tymur Kulivar"
-    val email = "tymurkulivar@gmail.com"
-    Row (
-        verticalAlignment = Alignment.CenterVertically,
+    user: FirebaseUser,
+    accountManager: AccountManager
+) {
+    val name = user.displayName ?: "User"
+    val email = user.email ?: ""
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    var profileImage by remember { mutableStateOf<Uri?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    // Image picker launcher
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            isLoading = true
+            coroutineScope.launch {
+                try {
+                    accountManager.uploadProfileImage(it)
+                    profileImage = accountManager.getProfileImage()
+                } catch (e: Exception) {
+                    Log.e("UserRow", "Failed to upload image", e)
+                } finally {
+                    isLoading = false
+                }
+            }
+        }
+    }
+
+    // Load profile image when composable is first created
+    LaunchedEffect(key1 = user.uid) {
+        isLoading = true
+        try {
+            profileImage = accountManager.getProfileImage()
+        } catch (e: Exception) {
+            Log.e("UserRow", "Failed to load profile image", e)
+        } finally {
+            isLoading = false
+        }
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 15.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 10.dp, vertical = 20.dp)
-    ){
-        Column {
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Box {
+                // Profile image
+                Surface(
+                    shape = CircleShape,
+                    border = BorderStroke(3.dp, MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.size(60.dp)
+                ) {
+                    if (isLoading) {
+                        // Show loading indicator
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.Center)
+                        )
+                    } else if (profileImage != null) {
+                        // Show profile image
+                        AsyncImage(
+                            model = ImageRequest.Builder(context)
+                                .data(profileImage)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Profile Picture",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        // Fallback icon/image
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile",
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(12.dp)
+                        )
+                    }
+                }
+
+                // Edit button
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 4.dp, y = 4.dp)
+                        .clickable { launcher.launch("image/*") }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Profile Picture",
+                        tint = Color.White,
+                        modifier = Modifier.padding(4.dp)
+                    )
+                }
+            }
             Text(name)
-            Text(email)
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Surface (
-            color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
-            modifier = Modifier.clip(CircleShape)
-        ){
-            Icon(
-                Icons.AutoMirrored.Outlined.ExitToApp,
-                "Exit",
+            Box(
                 modifier = Modifier
-                    .size(50.dp)
-                    .padding(10.dp)
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
                     .clickable {
                         loginNav.navigate("logIn") {
                             popUpTo(0) {
                                 inclusive = true
                             }
                         }
-                    },
-            )
+                    }
+                    .align(Alignment.CenterVertically)
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Outlined.ExitToApp,
+                    contentDescription = "Exit",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(35.dp)
+                        .align(Alignment.Center)
+                )
+            }
         }
+        Text(email)
     }
 }
 
@@ -328,9 +451,11 @@ fun Picker(
         mutableStateOf(false)
     }
 
-    var persistedText by rememberSaveable { mutableStateOf(
-        configValues.first { it.lowercase().contains(picked.lowercase()) }
-    ) }
+    var persistedText by rememberSaveable {
+        mutableStateOf(
+            configValues.first { it.lowercase().contains(picked.lowercase()) }
+        )
+    }
 
     Box {
         Row(
@@ -356,9 +481,10 @@ fun Picker(
                 isDropDownExpanded = false
             }) {
             configValues.forEach { item ->
-                DropdownMenuItem(text = {
-                    Text(text = item)
-                },
+                DropdownMenuItem(
+                    text = {
+                        Text(text = item)
+                    },
                     onClick = {
                         isDropDownExpanded = false
                         persistedText = item
@@ -408,9 +534,10 @@ fun CategoryPicker(
                 isDropDownExpanded = false
             }) {
             configValues.forEach { category ->
-                DropdownMenuItem(text = {
-                    Text(text = category.name)
-                },
+                DropdownMenuItem(
+                    text = {
+                        Text(text = category.name)
+                    },
                     onClick = {
                         isDropDownExpanded = false
                         Log.i("CategoryPicker", "Selected category: ${category.id}")
