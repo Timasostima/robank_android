@@ -7,10 +7,11 @@ class CategoryData(
 )
 
 data class GoalData(
-    var id: Int = 0,
-    var name: String,
-    var price: Double,
-    var index: Int
+    val id: Int,
+    val name: String,
+    val price: Double,
+    val index: Int = 0,
+    val imageUrl: String? = null
 )
 
 data class BillData(

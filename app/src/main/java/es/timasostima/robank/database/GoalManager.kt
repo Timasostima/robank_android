@@ -1,6 +1,10 @@
 package es.timasostima.robank.database
 
 import android.util.Log
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import es.timasostima.robank.api.RetrofitClient
 import es.timasostima.robank.dto.GoalDTO
 import es.timasostima.robank.dto.GoalData
@@ -9,8 +13,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.io.IOException
 
 class GoalManager(
+    private val context: Context,
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 ) {
     private val apiClient = RetrofitClient.apiService
@@ -88,6 +101,56 @@ class GoalManager(
                 Log.e("GoalManager", "Error deleting goal", e)
             }
         }
+    }
+
+    suspend fun uploadGoalImage(goalId: Int, uri: Uri) {
+        try {
+            val file = createTempFileFromUri(uri)
+            val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+            val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+            
+            val response = apiClient.uploadGoalImage(goalId, body)
+            if (!response.isSuccessful) {
+                Log.e("GoalManager", "Failed to upload image: ${response.errorBody()?.string()}")
+            } else {
+                // Update the goal in the local state
+                _goalsState.value = _goalsState.value.map {
+                    if (it.id == goalId) {
+                        it.copy(imageUrl = response.body()?.get("filename"))
+                    } else {
+                        it
+                    }
+                }
+            }
+            
+            // Delete temp file
+            file.delete()
+        } catch (e: Exception) {
+            Log.e("GoalManager", "Error uploading goal image", e)
+        }
+    }
+    
+    suspend fun getGoalImage(goalId: Int): Bitmap? {
+        return try {
+            val response = apiClient.getGoalImage(goalId)
+            val inputStream = response.byteStream()
+            BitmapFactory.decodeStream(inputStream)
+        } catch (e: Exception) {
+            Log.e("GoalManager", "Error getting goal image", e)
+            null
+        }
+    }
+    
+    private suspend fun createTempFileFromUri(uri: Uri): File = withContext(Dispatchers.IO) {
+        val inputStream: InputStream = context.contentResolver.openInputStream(uri)
+            ?: throw IOException("Failed to open input stream for URI: $uri")
+        
+        val tempFile = File.createTempFile("upload_", ".jpg", context.cacheDir)
+        FileOutputStream(tempFile).use { outputStream ->
+            inputStream.copyTo(outputStream)
+        }
+        
+        return@withContext tempFile
     }
 
     private fun calculateNextIndex(): Int {

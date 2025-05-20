@@ -46,6 +46,17 @@ interface RobankApiService {
     @DELETE("goals/{id}")
     suspend fun deleteGoal(@Path("id") id: Int): Response<Unit>
 
+    @Multipart
+    @POST("goals/{id}/image")
+    suspend fun uploadGoalImage(
+        @Path("id") goalId: Int,
+        @Part image: MultipartBody.Part
+    ): Response<Map<String, String>>
+
+    @GET("goals/{id}/image")
+    @Streaming
+    suspend fun getGoalImage(@Path("id") goalId: Int): ResponseBody
+
 
     @GET("categories")
     suspend fun getCategories(): Response<List<CategoryData>>

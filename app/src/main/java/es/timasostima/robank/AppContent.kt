@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,8 +60,8 @@ fun App(
     LaunchedEffect(theme) {
         changeMode(ThemeMode.toBooleanForDarkMode(theme))
     }
-
-    val goalManager = remember { GoalManager() }
+    val context = LocalContext.current
+    val goalManager = remember { GoalManager(context) }
     val goals by goalManager.goalsState.collectAsState()
 
     val categoriesManager = remember { CategoryManager() }
