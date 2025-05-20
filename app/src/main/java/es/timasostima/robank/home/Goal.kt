@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +52,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import es.timasostima.robank.R
-import es.timasostima.robank.api.RetrofitClient
 import es.timasostima.robank.database.GoalManager
 import es.timasostima.robank.dto.GoalData
 import kotlinx.coroutines.launch
@@ -62,7 +62,8 @@ fun ExpandableGoal(
     modifier: Modifier = Modifier,
     active: Boolean = false,
     goalManager: GoalManager,
-    currency: String
+    currency: String,
+    firstGoalImageState: MutableState<Bitmap?> = remember { mutableStateOf(null) }
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
@@ -71,6 +72,11 @@ fun ExpandableGoal(
     // State for storing the goal image
     var goalImage by remember { mutableStateOf<Bitmap?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+
+    // First, immediately use the shared image if available (without setting isLoading)
+    if (active && firstGoalImageState.value != null) {
+        goalImage = firstGoalImageState.value
+    }
 
     // Image picker launcher
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -90,15 +96,22 @@ fun ExpandableGoal(
         }
     }
 
-    // Load goal image when composable is first created or when goal changes
-    LaunchedEffect(key1 = goal.id) {
-        isLoading = true
-        try {
-            goalImage = goalManager.getGoalImage(goal.id)
-        } catch (e: Exception) {
-            Log.e("ExpandableGoal", "Failed to load goal image", e)
-        } finally {
-            isLoading = false
+    LaunchedEffect(goal.id) {
+        if (goalImage == null) {
+            isLoading = true
+            try {
+                val image = goalManager.getGoalImage(goal.id)
+                goalImage = image
+
+                // If this is the active goal, update the shared state too
+                if (active && image != null) {
+                    firstGoalImageState.value = image
+                }
+            } catch (e: Exception) {
+                Log.e("ExpandableGoal", "Failed to load goal image", e)
+            } finally {
+                isLoading = false
+            }
         }
     }
 
@@ -112,21 +125,20 @@ fun ExpandableGoal(
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
         ) {
-            // Display the goal image or fallback to the default image
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (goalImage != null) {
+            if (goalImage != null) {
                 Image(
                     bitmap = goalImage!!.asImageBitmap(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
+            } else if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             } else {
                 // Fallback image
                 Image(
@@ -236,43 +248,51 @@ fun ExpandableGoal(
 fun BasicGoal(
     goal: GoalData,
     modifier: Modifier = Modifier,
-    currency: String
+    currency: String,
+    firstGoalImageState: MutableState<Bitmap?>
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var goalImage by remember { mutableStateOf<Bitmap?>(null) }
     var isLoading by remember { mutableStateOf(false) }
-    
-    // Load goal image
+
+    // First, immediately use the shared image if available
+    if (firstGoalImageState.value != null) {
+        goalImage = firstGoalImageState.value
+    }
+
+    // Only load from network if needed
     LaunchedEffect(key1 = goal.id) {
-        isLoading = true
-        try {
-            val goalManager = GoalManager(context)
-            goalImage = goalManager.getGoalImage(goal.id)
-        } catch (e: Exception) {
-            Log.e("BasicGoal", "Failed to load goal image", e)
-        } finally {
-            isLoading = false
+        if (goalImage == null) {
+            isLoading = true
+            try {
+                val goalManager = GoalManager(context)
+                goalImage = goalManager.getGoalImage(goal.id)
+            } catch (e: Exception) {
+                Log.e("BasicGoal", "Failed to load goal image", e)
+            } finally {
+                isLoading = false
+            }
         }
     }
     
     Box(
         modifier = modifier
     ) {
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (goalImage != null) {
+        if (goalImage != null) {
             Image(
                 bitmap = goalImage!!.asImageBitmap(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+        } else if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         } else {
             // Fallback image
             Image(

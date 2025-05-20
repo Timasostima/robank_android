@@ -1,5 +1,6 @@
 package es.timasostima.robank.home
 
+import android.graphics.Bitmap
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +38,15 @@ fun HomeScreen(
     billManager: BillManager,
     currency: String
 ) {
+    val firstGoalImageState = remember { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(goalsList) {
+        if (goalsList.isNotEmpty()) {
+            val firstGoalId = goalsList.first().id
+            firstGoalImageState.value = goalManager.getGoalImage(firstGoalId)
+        }
+    }
+
     val curSym = when (currency) {
         "usd" -> "$"
         "eur" -> "€"
@@ -57,7 +68,8 @@ fun HomeScreen(
                     categoryManager,
                     categoriesList,
                     billManager,
-                    curSym
+                    curSym,
+                    firstGoalImageState
                 )
             }
             composable("goals") {
@@ -67,7 +79,8 @@ fun HomeScreen(
                     this@composable,
                     goalsList,
                     goalManager,
-                    curSym
+                    curSym,
+                    firstGoalImageState
                 )
             }
         }

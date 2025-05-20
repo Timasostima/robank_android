@@ -3,7 +3,7 @@ package es.timasostima.robank.home
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,7 +77,8 @@ fun Home(
     categoryManager: CategoryManager,
     categoriesList: List<CategoryData>,
     billManager: BillManager,
-    currency: String
+    currency: String,
+    firstGoalImageState: MutableState<Bitmap?>
 ) {
     val context = LocalContext.current
     val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
@@ -122,7 +124,8 @@ fun Home(
                                     launchSingleTop = true
                                 }
                             },
-                        currency = currency
+                        currency = currency,
+                        firstGoalImageState
                     )
                 }
             }

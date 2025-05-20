@@ -1,6 +1,7 @@
 package es.timasostima.robank.home
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -29,6 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,7 +58,8 @@ fun Goals(
     animatedContentScope: AnimatedContentScope,
     goalsList: List<GoalData>,
     goalManager: GoalManager,
-    currency: String
+    currency: String,
+    firstGoalImageState: MutableState<Bitmap?>
 ) {
     val context = LocalContext.current
     with(sharedTransitionScope) {
@@ -97,7 +100,8 @@ fun Goals(
                             modifier = if (goalsList.indexOf(it) == 0) modActive else mod,
                             active = goalsList.indexOf(it) == 0,
                             goalManager = goalManager,
-                            currency = currency
+                            currency = currency,
+                            firstGoalImageState = if (goalsList.indexOf(it) == 0) firstGoalImageState else remember { mutableStateOf(null) }
                         )
                     }
                 }

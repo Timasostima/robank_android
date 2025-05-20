@@ -31,6 +31,8 @@ class GoalManager(
     private val _goalsState = MutableStateFlow<List<GoalData>>(emptyList())
     val goalsState: StateFlow<List<GoalData>> = _goalsState
 
+    private val imageCache = mutableMapOf<Int, Bitmap>()
+
     init {
         loadGoals()
     }
@@ -129,16 +131,34 @@ class GoalManager(
             Log.e("GoalManager", "Error uploading goal image", e)
         }
     }
-    
+
     suspend fun getGoalImage(goalId: Int): Bitmap? {
+        // Check cache first
+        imageCache[goalId]?.let { return it }
+
         return try {
             val response = apiClient.getGoalImage(goalId)
             val inputStream = response.byteStream()
-            BitmapFactory.decodeStream(inputStream)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+
+            // Cache the bitmap for future use
+            bitmap?.let { imageCache[goalId] = it }
+            bitmap
         } catch (e: Exception) {
             Log.e("GoalManager", "Error getting goal image", e)
             null
         }
+    }
+
+    fun preloadFirstGoalImage() {
+        coroutineScope.launch(Dispatchers.IO) {
+            val firstGoalId = _goalsState.value.firstOrNull()?.id ?: return@launch
+            getGoalImage(firstGoalId) // This will cache the image
+        }
+    }
+
+    fun clearImageCache() {
+        imageCache.clear()
     }
     
     private suspend fun createTempFileFromUri(uri: Uri): File = withContext(Dispatchers.IO) {
