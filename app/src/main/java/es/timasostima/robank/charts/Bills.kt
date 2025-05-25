@@ -202,7 +202,7 @@ fun Bills(
                         Text(
                             text,
                             fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = Color(0xFF423E54),
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(20.dp))
@@ -218,7 +218,7 @@ fun Bills(
                             modifier = Modifier.weight(2f)
                         )
                         Text(
-                            billsList[it].time,
+                            billsList[it].time.split(":").take(2).joinToString(":"),
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurface,

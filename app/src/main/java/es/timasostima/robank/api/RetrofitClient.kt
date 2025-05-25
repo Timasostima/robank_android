@@ -12,13 +12,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "http://192.168.1.48:8080/"
+    private const val BASE_URL = "http://robank-api.tymurkulivar.dev/"
 
     private val firebaseAuthInterceptor = Interceptor { chain ->
         val originalRequest = chain.request()
 
-        // Skip authentication for register endpoint
-        if (originalRequest.url.encodedPath.endsWith("/register")) {
+        // Skip authentication for public endpoints
+        val publicEndpoints = listOf("/health", "/user/register", "/user/check-new-user")
+        if (publicEndpoints.any { originalRequest.url.encodedPath.contains(it) }) {
             return@Interceptor chain.proceed(originalRequest)
         }
 

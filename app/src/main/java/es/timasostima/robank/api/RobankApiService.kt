@@ -24,6 +24,12 @@ data class RobankUser(
 )
 
 interface RobankApiService {
+    @GET("health")
+    suspend fun pingServer(): Response<Unit>
+
+    @GET("user/check-new-user")
+    suspend fun checkNewUser(@Query("userId") userId: String): Response<Map<String, String>>
+
     @POST("user/register")
     suspend fun registerUser(@Body user: RobankUser): Response<Map<String, String>>
 

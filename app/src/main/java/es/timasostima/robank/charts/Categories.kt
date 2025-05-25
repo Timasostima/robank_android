@@ -162,7 +162,7 @@ fun Categories(
                         Text(
                             text,
                             fontSize = 20.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = Color(0xFF423E54),
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(20.dp))

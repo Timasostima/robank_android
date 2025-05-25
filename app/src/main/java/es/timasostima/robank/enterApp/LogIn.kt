@@ -205,42 +205,24 @@ fun LogIn(
                     Text(stringResource(R.string.log_in))
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            val result = accountManager.signInGoogle()
-
-                            if (result is LogInResult.Success) {
-                                navController.navigate("app/${result.user.uid}") {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        inclusive = true
-                                    }
-                                }
-                            }
-                        }
-                    },
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.google),
-                        contentDescription = "Google",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(25.dp)
-                    )
-                }
 //                IconButton(
 //                    onClick = {
 //                        scope.launch {
 //                            val result = accountManager.signInGoogle()
 //
 //                            if (result is LogInResult.Success) {
-//                                navController.navigate("app")
+//                                navController.navigate("app/${result.user.uid}") {
+//                                    popUpTo(navController.graph.startDestinationId) {
+//                                        inclusive = true
+//                                    }
+//                                }
 //                            }
 //                        }
 //                    },
 //                ) {
 //                    Icon(
-//                        painter = painterResource(R.drawable.github),
-//                        contentDescription = "Github",
+//                        painter = painterResource(R.drawable.google),
+//                        contentDescription = "Google",
 //                        tint = MaterialTheme.colorScheme.primary,
 //                        modifier = Modifier.size(25.dp)
 //                    )

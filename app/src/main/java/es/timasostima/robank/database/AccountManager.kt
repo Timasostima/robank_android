@@ -44,6 +44,18 @@ class AccountManager(private val activity: Activity) {
         password: String,
         name: String
     ): SignUpResult {
+        val isBackendAvailable = try {
+            val response = RetrofitClient.apiService.pingServer()
+            response.isSuccessful
+        } catch (e: Exception) {
+            Log.e("AccountManager", "Backend not available", e)
+            return SignUpResult.Failure
+        }
+
+        if (!isBackendAvailable) {
+            return SignUpResult.Failure
+        }
+
         return try {
             try {
                 credentialManager.createCredential(
@@ -116,6 +128,17 @@ class AccountManager(private val activity: Activity) {
     }
 
     suspend fun logIn(email: String, password: String): LogInResult {
+        val isBackendAvailable = try {
+            val response = RetrofitClient.apiService.pingServer()
+            response.isSuccessful
+        } catch (e: Exception) {
+            Log.e("AccountManager", "Backend not available", e)
+            return LogInResult.Failure
+        }
+
+        if (!isBackendAvailable) {
+            return LogInResult.Failure
+        }
         return try {
             var result: LogInResult? = null
             auth.signInWithEmailAndPassword(email, password)
@@ -134,43 +157,81 @@ class AccountManager(private val activity: Activity) {
         }
     }
 
-    suspend fun signInGoogle(): LogInResult {
-        return try {
-            val ranNonce: String = UUID.randomUUID().toString()
-            val bytes: ByteArray = ranNonce.toByteArray()
-            val md: MessageDigest = MessageDigest.getInstance("SHA-256")
-            val digest: ByteArray = md.digest(bytes)
-            val hashedNonce: String = digest.fold("") { str, it -> str + "%02x".format(it) }
-
-            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(BuildConfig.GOOGLE_SERVER_CLIENT_ID)
-                .setNonce(hashedNonce)
-                .build()
-
-            val request: GetCredentialRequest = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build()
-
-            val result = credentialManager.getCredential(activity, request)
-            val credential = result.credential
-            if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                val googleIdTokenCredential =
-                    GoogleIdTokenCredential.createFrom(credential.data)
-                val authCredential =
-                    GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
-
-                val a = auth.signInWithCredential(authCredential).await()
-            } else {
-                println("Error")
-            }
-
-            auth.currentUser?.let { LogInResult.Success(it) } ?: LogInResult.Failure
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LogInResult.Failure
-        }
-    }
+//    suspend fun signInGoogle(): LogInResult {
+//        // Check if backend is available
+//        val isBackendAvailable = try {
+//            val response = RetrofitClient.apiService.pingServer()
+//            response.isSuccessful
+//        } catch (e: Exception) {
+//            Log.e("AccountManager", "Backend not available", e)
+//            return LogInResult.Failure
+//        }
+//
+//        if (!isBackendAvailable) {
+//            return LogInResult.Failure
+//        }
+//
+//        return try {
+//            // Generate secure nonce for Google authentication
+//            val ranNonce = UUID.randomUUID().toString()
+//            val bytes = ranNonce.toByteArray()
+//            val md = MessageDigest.getInstance("SHA-256")
+//            val digest = md.digest(bytes)
+//            val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
+//
+//            // Configure Google Sign-In options
+//            val googleIdOption = GetGoogleIdOption.Builder()
+//                .setFilterByAuthorizedAccounts(false)
+//                .setServerClientId(BuildConfig.GOOGLE_SERVER_CLIENT_ID)
+//                .setNonce(hashedNonce)
+//                .build()
+//
+//            val request = GetCredentialRequest.Builder()
+//                .addCredentialOption(googleIdOption)
+//                .build()
+//
+//            // Get Google credentials
+//            val result = credentialManager.getCredential(activity, request)
+//            val credential = result.credential
+//
+//            if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+//                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+//                val authCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+//
+//                // THIS IS THE MISSING STEP - Actually sign in with Firebase using the credential
+//                val authResult = auth.signInWithCredential(authCredential).await()
+//                val currentUser = authResult.user ?: return LogInResult.Failure
+//
+//                try {
+//                    val response = RetrofitClient.apiService.checkNewUser(currentUser.uid)
+//                    if (response.isSuccessful) {
+//                        val backendUser = RobankUser(
+//                            uid = currentUser.uid,
+//                            email = currentUser.email ?: "",
+//                            name = currentUser.displayName ?: "User",
+//                            pictureUrl = currentUser.photoUrl?.toString()
+//                        )
+//                        val registerResponse = RetrofitClient.apiService.registerUser(backendUser)
+//                        if (!registerResponse.isSuccessful) {
+//                            Log.e("AccountManager", "Backend registration failed: ${registerResponse.errorBody()?.string()}")
+//                            return LogInResult.Failure
+//                        }
+//                    }
+//                    return LogInResult.Success(currentUser)
+//                } catch (e: Exception) {
+//                    Log.e("AccountManager", "Error communicating with backend", e)
+//                    return LogInResult.Failure
+//                }
+//            } else {
+//                Log.e("AccountManager", "Invalid credential type received")
+//                return LogInResult.Failure
+//            }
+//        } catch (e: Exception) {
+//            Log.e("AccountManager", "Google sign-in failed", e)
+//            e.printStackTrace()
+//            LogInResult.Failure
+//        }
+//    }
 
     private suspend fun checkEmailVerification(): Boolean {
         return try {
